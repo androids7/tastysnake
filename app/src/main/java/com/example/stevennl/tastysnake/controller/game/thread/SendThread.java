@@ -54,7 +54,8 @@ public class SendThread extends HandlerThread {
             switch (msg.what) {
                 case MSG_SEND:
                     Packet pkt = (Packet)msg.obj;
-                    Log.d(TAG, "Send packet: " + pkt.toString() + " Cnt: " + (++sendCnt));
+                    Log.d(TAG, "Send pkt: " + pkt.toString() + " Cnt: " + (++sendCnt)
+                            + " Time: " + System.currentTimeMillis() + " ms");
                     manager.get().sendToRemote(pkt.toBytes());
                     break;
                 default:

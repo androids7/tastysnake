@@ -11,7 +11,7 @@ public class Packet implements Serializable {
     public static final int SIZE = 5;  // Fixed packet size in bytes
     private static final char TYPE_FOOD_LENGTHEN = 'a';
     private static final char TYPE_FOOD_SHORTEN = 'b';
-    private static final char TYPE_DIRECTION = 'c';
+    private static final char TYPE_MOVE = 'c';
     private static final char TYPE_RESTART = 'd';
     private static final char TYPE_TIME = 'e';
     private static final char TYPE_WIN = 'f';
@@ -28,7 +28,7 @@ public class Packet implements Serializable {
     public enum Type {
         FOOD_LENGTHEN,
         FOOD_SHORTEN,
-        DIRECTION,
+        MOVE,
         RESTART,
         TIME,
         WIN,
@@ -58,8 +58,8 @@ public class Packet implements Serializable {
                 x = Integer.parseInt(str.substring(1, 3));
                 y = Integer.parseInt(str.substring(3, 5));
                 break;
-            case TYPE_DIRECTION:
-                type = Type.DIRECTION;
+            case TYPE_MOVE:
+                type = Type.MOVE;
                 direc = Direction.values()[str.charAt(1) - '0'];
                 break;
             case TYPE_RESTART:
@@ -99,8 +99,8 @@ public class Packet implements Serializable {
                 builder.append(x / 10 == 0 ? "0" + x : x);
                 builder.append(y / 10 == 0 ? "0" + y : y);
                 break;
-            case DIRECTION:
-                builder.append(TYPE_DIRECTION);
+            case MOVE:
+                builder.append(TYPE_MOVE);
                 builder.append(direc.ordinal());
                 break;
             case RESTART:
@@ -146,13 +146,13 @@ public class Packet implements Serializable {
     }
 
     /**
-     * Create a DIRECTION packet.
+     * Create a MOVE packet.
      *
      * @param direc The direction to be stored in the packet
      */
-    public static Packet direction(Direction direc) {
+    public static Packet move(Direction direc) {
         Packet pkt = new Packet();
-        pkt.type = Type.DIRECTION;
+        pkt.type = Type.MOVE;
         pkt.direc = direc;
         return pkt;
     }
@@ -271,7 +271,7 @@ public class Packet implements Serializable {
             case FOOD_SHORTEN:
                 str = str + " FoodX: " + getFoodX() + " FoodY: " + getFoodY();
                 break;
-            case DIRECTION:
+            case MOVE:
                 str = str + " Direc: " + direc.name();
                 break;
             case RESTART:

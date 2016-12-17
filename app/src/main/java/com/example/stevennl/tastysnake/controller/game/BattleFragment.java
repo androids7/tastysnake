@@ -164,9 +164,10 @@ public class BattleFragment extends Fragment {
             @Override
             public void onReceive(int bytesCount, byte[] data) {
                 Packet pkt = new Packet(data);
-                Log.d(TAG, "Receive packet: " + pkt.toString() + " Cnt: " + (++recvCnt));
+                Log.d(TAG, "Receive pkt: " + pkt.toString() + " Cnt: " + (++recvCnt)
+                        + " Time: " + System.currentTimeMillis() + " ms");
                 switch (pkt.getType()) {
-                    case DIRECTION:
+                    case MOVE:
                         Direction direc = pkt.getDirec();
                         Snake.MoveResult res = enemySnake.move(direc);
                         handleMoveResult(enemySnake, res);
@@ -372,7 +373,7 @@ public class BattleFragment extends Fragment {
             @Override
             public void run() {
                 Direction direc = sensorCtrl.getDirection();
-                sendThread.send(Packet.direction(direc));
+                sendThread.send(Packet.move(direc));
                 Snake.MoveResult res = mySnake.move(direc);
                 handleMoveResult(mySnake, res);
             }

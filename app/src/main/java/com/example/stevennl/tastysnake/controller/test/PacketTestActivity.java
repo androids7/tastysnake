@@ -28,11 +28,11 @@ public class PacketTestActivity extends BaseActivity {
                 Packet[] pkts = new Packet[1000];
                 pkts[0] = Packet.food(0, 8, true);
                 pkts[1] = Packet.food(35, 10, false);
-                pkts[2] = Packet.direction(Direction.UP);
-                pkts[3] = Packet.direction(Direction.DOWN);
-                pkts[4] = Packet.direction(Direction.LEFT);
-                pkts[5] = Packet.direction(Direction.RIGHT);
-                pkts[6] = Packet.direction(Direction.NONE);
+                pkts[2] = Packet.move(Direction.UP);
+                pkts[3] = Packet.move(Direction.DOWN);
+                pkts[4] = Packet.move(Direction.LEFT);
+                pkts[5] = Packet.move(Direction.RIGHT);
+                pkts[6] = Packet.move(Direction.NONE);
                 pkts[7] = Packet.restart(Snake.Type.SERVER);
                 pkts[8] = Packet.restart(Snake.Type.CLIENT);
                 pkts[9] = Packet.time(55);
