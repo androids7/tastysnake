@@ -54,8 +54,7 @@ public class HelpDialog extends Dialog {
 
     private void initInfoTxt(View v) {
         TextView infoTxt = (TextView) v.findViewById(R.id.dialog_help_infoTxt);
-        infoTxt.setText(String.format(context.getString(R.string.help_info),
-                Config.DURATION_ATTACK));
+        infoTxt.setText(context.getString(R.string.help_info, Config.DURATION_ATTACK));
         infoTxt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

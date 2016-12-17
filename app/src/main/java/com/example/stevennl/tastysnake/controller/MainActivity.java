@@ -1,7 +1,6 @@
 package com.example.stevennl.tastysnake.controller;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,7 @@ import com.example.stevennl.tastysnake.controller.test.DBTestActivity;
 import com.example.stevennl.tastysnake.controller.test.DialogTestActivity;
 import com.example.stevennl.tastysnake.controller.test.DrawableGridTestActivity;
 import com.example.stevennl.tastysnake.controller.test.PacketTestActivity;
-import com.example.stevennl.tastysnake.controller.test.RequestTestActivity;
+import com.example.stevennl.tastysnake.controller.test.NetworkTestActivity;
 import com.example.stevennl.tastysnake.controller.test.SensorTestActivity;
 
 public class MainActivity extends BaseActivity {
@@ -90,7 +89,7 @@ public class MainActivity extends BaseActivity {
         reqBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, RequestTestActivity.class));
+                startActivity(new Intent(MainActivity.this, NetworkTestActivity.class));
             }
         });
 

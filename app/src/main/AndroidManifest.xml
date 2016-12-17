@@ -45,7 +45,7 @@
             android:name=".controller.test.DialogTestActivity"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".controller.test.RequestTestActivity"
+            android:name=".controller.test.NetworkTestActivity"
             android:screenOrientation="portrait"/>
     </application>
 

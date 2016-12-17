@@ -455,7 +455,7 @@ public class BattleFragment extends Fragment {
         if (timeRemain / 10 == 0) {
             timeStr = "0" + timeStr;
         }
-        timeTxt.setText(String.format(getString(R.string.switch_role_remain), timeStr));
+        timeTxt.setText(getString(R.string.switch_role_remain, timeStr));
     }
 
     /**

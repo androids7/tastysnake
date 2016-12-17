@@ -1,14 +1,15 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:scrollbars="none"
     tools:context="com.example.stevennl.tastysnake.controller.game.AnalysisFragment">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/analysis_info"
+        android:layout_gravity="center"
+        android:text="@string/analysis_local"
         android:textSize="@dimen/text_3"
         android:gravity="center"
         android:id="@+id/analysis_infoTxt"/>
-</RelativeLayout>
+</ScrollView>

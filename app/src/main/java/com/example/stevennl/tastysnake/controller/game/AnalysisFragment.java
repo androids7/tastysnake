@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.example.stevennl.tastysnake.Config;
 import com.example.stevennl.tastysnake.R;
 import com.example.stevennl.tastysnake.model.AnalysisData;
 import com.example.stevennl.tastysnake.util.CommonUtil;
+import com.example.stevennl.tastysnake.util.NetworkUtil;
 
 /**
  * Data analysis page.
@@ -23,6 +25,7 @@ public class AnalysisFragment extends Fragment {
     private static final String TAG = "AnalysisFragment";
     private GameActivity act;
     private Handler handler;
+    private NetworkUtil networkUtil;
 
     private TextView infoTxt;
 
@@ -36,6 +39,7 @@ public class AnalysisFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handler = new Handler();
+        networkUtil = NetworkUtil.getInstance(act);
     }
 
     @Override
@@ -43,6 +47,7 @@ public class AnalysisFragment extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_analysis, container, false);
         initInfoTxt(v);
+        analyzeRemoteData();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -54,17 +59,41 @@ public class AnalysisFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        networkUtil.cancelAll();
+    }
+
     private void initInfoTxt(View v) {
         infoTxt = (TextView) v.findViewById(R.id.analysis_infoTxt);
         infoTxt.setVisibility(View.GONE);
         String info;
         AnalysisData data = AnalysisData.create(act);
         if (data != null) {
-            info = String.format(getString(R.string.analysis_info), data.N, data.X, data.A,
+            info = getString(R.string.analysis_local, data.N, data.X, data.A,
                     data.B, data.Y, data.C, data.D, data.T, data.L1, data.L2, data.W, data.P);
         } else {
             info = getString(R.string.analysis_no_data);
         }
         infoTxt.setText(info);
+    }
+
+    /**
+     * Analyze remote data and show the result.
+     */
+    private void analyzeRemoteData() {
+        if (NetworkUtil.isNetworkAvailable(act)) {
+            networkUtil.getAvgW(new NetworkUtil.ResultListener<Integer>() {
+                @Override
+                public void onGotResult(Integer result) {
+                    Log.d(TAG, "Got avg W: " + result);
+                    // TODO NETWORK Compute U and show info
+//                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_exceed, 10));
+//                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_equal));
+//                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_below, 20));
+                }
+            });
+        }
     }
 }

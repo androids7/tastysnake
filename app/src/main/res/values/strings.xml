@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">攻防贪吃蛇</string>
 
-    <string name="get">GET</string>
-    <string name="post">POST</string>
+    <string name="insert_w">Insert W</string>
+    <string name="get_all_w">Get All W</string>
+    <string name="get_avg_w">Get Avg W</string>
     <string name="generate">Gen</string>
     <string name="remove_all">Remove All</string>
     <string name="connect">Connect</string>
@@ -35,7 +36,7 @@
         6.作为攻击者，请毫不犹豫地追击对手吧！\n\n
         7.撞到自己的身体或者战场边界将会被判定为失败。</string>
 
-    <string name="analysis_info">您到目前为止一共进行了 %1$d 局游戏\n\n
+    <string name="analysis_local">您到目前为止一共进行了 %1$d 局游戏\n\n
         赢 %2$d 局，其中智商碾压 %3$d 局，侥幸获胜 %4$d 局\n\n
         输 %5$d 局，其中被对方戏耍 %6$d 局，因失误失败 %7$d 局\n\n
         每一局的平均时长为 %8$d 秒\n\n
@@ -44,6 +45,9 @@
         您的能力指数为: %11$d\n\n
         您的技术评估为: %12$s</string>
     <string name="analysis_no_data">您还未进行过游戏，快去战斗吧！</string>
+    <string name="analysis_remote_exceed">您的能力高出平均水平 %1$d%%，值得鼓励！</string>
+    <string name="analysis_remote_equal">您的能力等于平均水平，加油！</string>
+    <string name="analysis_remote_below">您的能力低于平均水平 %1$d%%，再加把劲！</string>
 
     <!-- Data analysis -->
     <string-array name="rank_array">
@@ -72,6 +76,6 @@
     <string name="pkt_test">Test Packet</string>
     <string name="db_test">Test Database</string>
     <string name="dialog_test">Test Dialog</string>
-    <string name="request_test">Test Request</string>
+    <string name="network_test">Test Network</string>
     <string name="test"> </string>
 </resources>

@@ -4,29 +4,29 @@ Use [database](./database.md) data to analyze user's behaviour.
 
 Author: [@stevennL](https://github.com/stevennL) [@xuanqu](https://github.com/xuanqu)
 
-Source: [AnalysisData.java](../app/src/main/java/com/example/stevennl/tastysnake/model/AnalysisData.java)
-
 ## Local
 
 Data analysis in local device.
 
+Source: [AnalysisData.java](../app/src/main/java/com/example/stevennl/tastysnake/model/AnalysisData.java)
+
 ### Description
 
-* 您到目前为止一共进行了N局游戏。
+1. 您到目前为止一共进行了N局游戏。
 
-* 赢X局，其中智商碾压A局，侥幸获胜B局。
+2. 赢X局，其中智商碾压A局，侥幸获胜B局。
 
-* 输Y局，其中被对方戏耍C局，因失误失败D局。
+3. 输Y局，其中被对方戏耍C局，因失误失败D局。
 
-* 每一局的平均时长为T秒。
+4. 每一局的平均时长为T秒。
 
-* 每一局你的蛇的平均长度为L1节。
+5. 每一局你的蛇的平均长度为L1节。
 
-* 每一局对方的蛇的平均长度为L2节。
+6. 每一局对方的蛇的平均长度为L2节。
 
-* 您的能力指数为W。
+7. 您的能力指数为W。
 
-* 您的技术评估为P。
+8. 您的技术评估为P。
 
 ### Definition
 
@@ -49,3 +49,31 @@ W = (100/N)\*((7\*A+5\*B)\*(18-log2(T+1))+(1\*C+3\*D)\*log2(T+2))
 |青铜|W < 1500|
 
 Use [formula_test.m](./formula_test.m)(MATLAB) to test W and P.
+
+## Remote
+
+Data analysis making use of server's database.
+
+### Description
+
+1. 您的能力高出平均水平U%，值得鼓励！
+
+2. 您的能力等于平均水平，加油！
+
+3. 您的能力低于平均水平U%，再加把劲！
+
+### Definition
+
+Get average W value from server, then:
+
+```c++
+if (W > avg) {
+    显示 Description#1;
+    U = 100 * (W - avg) / avg;
+} else if (W == avg) {
+    显示 Description#2;
+} else if (W < avg) {
+    显示 Description#3;
+    U = 100 * (avg - W) / avg;
+}
+```

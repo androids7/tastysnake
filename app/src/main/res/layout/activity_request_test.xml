@@ -1,29 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_request_test"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.stevennl.tastysnake.controller.test.RequestTestActivity">
-    <TextView
+    android:orientation="vertical"
+    tools:context="com.example.stevennl.tastysnake.controller.test.NetworkTestActivity">
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/req_test_infoTxt" />
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/req_test_infoTxt" />
+    </ScrollView>
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true">
+        android:gravity="center">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/req_test_getBtn"
-            android:text="@string/get"/>
+            android:id="@+id/req_test_insertWBtn"
+            android:text="@string/insert_w"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/req_test_postBtn"
-            android:text="@string/post"/>
+            android:id="@+id/req_test_getAvgWBtn"
+            android:text="@string/get_avg_w"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/req_test_getAllWBtn"
+            android:text="@string/get_all_w"/>
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>
