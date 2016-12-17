@@ -25,4 +25,8 @@
         android:layout_marginBottom="@dimen/margin_snake_hide_info"
         android:layout_toEndOf="@id/home_mySnake_img"
         android:layout_marginStart="@dimen/margin_median"/>
+    <!-- To reduce SurfaceView's flicker -->
+    <com.example.stevennl.tastysnake.widget.DrawableGrid
+        android:layout_width="0dp"
+        android:layout_height="0dp"/>
 </RelativeLayout>

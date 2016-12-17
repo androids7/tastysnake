@@ -50,6 +50,8 @@ public class CommonUtil {
      * @param v The view to be shown
      */
     public static void showViewPretty(View v) {
+        v.setAlpha(0);
+        v.setVisibility(View.VISIBLE);
         ObjectAnimator.ofFloat(v, ATTR_ALPHA, 0, 1)
                 .setDuration(Config.DURATION_SHOW_PRETTY).start();
     }

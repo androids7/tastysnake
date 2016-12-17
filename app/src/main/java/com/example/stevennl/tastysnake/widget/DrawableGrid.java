@@ -26,7 +26,7 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
 
     private int rowCount = 1;
     private int colCount = 1;
-    private int bgColor = Color.TRANSPARENT;
+    private int bgColor = Config.COLOR_MAP_BG;
     private boolean showGridLine = false;
 
     private int horInterval = 0;
@@ -151,6 +151,7 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
         private Canvas canvas;
 
         private DrawThread(SurfaceHolder holder_) {
+            super(TAG + "Thread");
             this.holder_ = holder_;
         }
 

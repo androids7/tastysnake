@@ -10,6 +10,5 @@
         android:text="@string/analysis_info"
         android:textSize="@dimen/text_3"
         android:gravity="center"
-        android:alpha="0"
         android:id="@+id/analysis_infoTxt"/>
 </RelativeLayout>

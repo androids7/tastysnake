@@ -4,12 +4,10 @@
     <color name="colorPrimaryDark">#009688</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="bgLight">#cccccc</color>
+    <color name="bgLight">#cecece</color>
     <color name="bgDark">#ff000000</color>
     <color name="defaultTextViewText">#6f6f6f</color>
     <color name="defaultButtonText">@color/bgLight</color>
-
-    <color name="bgDialog">@color/bgLight</color>
 
     <color name="roleText">#cc0000</color>
     <color name="foodLengthen">#81C784</color>

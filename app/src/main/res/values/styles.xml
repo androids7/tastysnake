@@ -9,7 +9,7 @@
         <item name="android:textViewStyle">@style/TextViewStyle</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="android:colorBackground">@color/bgLight</item>
-        <item name="colorDialogBg">@color/bgDialog</item>
+        <item name="colorDialogBg">?android:colorBackground</item>
         <item name="colorRoleTxt">@color/roleText</item>
         <item name="colorFoodLengthen">@color/foodLengthen</item>
         <item name="colorFoodShorten">@color/foodShorten</item>
@@ -28,7 +28,7 @@
         <item name="android:textViewStyle">@style/TextViewStyle</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
         <item name="android:colorBackground">@color/bgDark</item>
-        <item name="colorDialogBg">@color/bgDialog</item>
+        <item name="colorDialogBg">?android:colorBackground</item>
         <item name="colorRoleTxt">@color/roleText</item>
         <item name="colorFoodLengthen">@color/foodLengthen</item>
         <item name="colorFoodShorten">@color/foodShorten</item>
