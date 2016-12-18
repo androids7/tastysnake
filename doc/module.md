@@ -1,6 +1,6 @@
 # Module
 
-Directory:
+#### Directory
 
 * [Game Elements](#game-elements)
 
@@ -38,7 +38,7 @@ Source: [DrawableGrid.java](../app/src/main/java/com/example/stevennl/tastysnake
 
 * Extend SurfaceView
 
-* Plot in a sub-thread.
+* Plot in a sub-thread
 
 ## Bluetooth
 
@@ -53,6 +53,8 @@ Source: [BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastys
 * Client: [ConnectThread](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/ConnectThread.java)
 
 * Data Channel: [ConnectedThread](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/ConnectedThread.java)
+
+* Custom [packet](./packet.md)
 
 ## Sensor
 
@@ -78,11 +80,11 @@ Library: [Google-volley](https://android.googlesource.com/platform/frameworks/vo
 
 Author: [@xuanqu](https://github.com/xuanqu)
 
-Docs: [data_analysis](data_analysis.md)
+Docs: [database](./database.md) [data_analysis](./data_analysis.md)
 
 * Analyze using data in local database
 
-* Analyze using data from remote server. 
+* Analyze using data from remote server
 
 * Upload local data to remote through [UploadService](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)
 
@@ -92,6 +94,6 @@ Author: [@wangty6](https://github.com/wangty6)
 
 * Server config
 
-* Insert new W value.
+* Insert new W value
 
-* Compute average W value.
+* Calculate average W value

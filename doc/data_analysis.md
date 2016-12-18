@@ -2,7 +2,7 @@
 
 Use [database](./database.md) data to analyze user's behaviour.
 
-Author: [@stevennL](https://github.com/stevennL) [@xuanqu](https://github.com/xuanqu)
+Author: [@xuanqu](https://github.com/xuanqu) [@stevennL](https://github.com/stevennL)
 
 ## Local
 

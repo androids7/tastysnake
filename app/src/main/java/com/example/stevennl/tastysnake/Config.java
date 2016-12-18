@@ -36,6 +36,7 @@ public class Config {
     public static final int BLUETOOTH_DISCOVERABLE_TIME = 180;  // s
     public static final int BLUETOOTH_DISCOVER_TIME = 5000;  // ms
 
+//    public static final String URL_INSERT_W = "http://192.168.199.105/api/testReq";
     public static final String URL_INSERT_W = "http://108.61.246.103:9000/w";
     public static final String URL_GET_AVG_W = "http://108.61.246.103:9000/w/mean";
     public static final String URL_GET_ALL_W = "http://108.61.246.103:9000/w/all";

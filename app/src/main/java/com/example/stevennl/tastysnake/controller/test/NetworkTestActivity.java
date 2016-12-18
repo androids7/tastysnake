@@ -100,7 +100,7 @@ public class NetworkTestActivity extends BaseActivity {
                         } else {
                             infoTxt.append("W in remote DB:\n");
                             for (String w : result) {
-                                infoTxt.append(w + "\n");
+                                infoTxt.append(w);
                             }
                         }
                     }
