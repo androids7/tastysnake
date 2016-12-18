@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -11,11 +12,13 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.stevennl.tastysnake.Config;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -74,56 +77,87 @@ public class NetworkUtil {
     /**
      * Get average W value from remote server.
      *
-     * @param resListener Called when the result is got
+     * @param listener A {@link ResultListener}
      */
-    public void getAvgW(final ResultListener<Integer> resListener) {
+    public void getAvgW(@Nullable final ResultListener<Integer> listener) {
         get(Config.URL_GET_AVG_W, null, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, "getAvgW() Response: " + response);
-                // TODO NETWORK Get average W value from response
-                int avgW = 999;
-                resListener.onGotResult(avgW);
+                int avgW = 0;
+                try {
+                    avgW = Integer.parseInt(response);
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, "getAvgW() error:", e);
+                }
+                if (listener != null) {
+                    listener.onGotResult(avgW);
+                }
             }
-        }, null);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "getAvgW(): " + error.toString());
+                if (listener != null) {
+                    listener.onError(error);
+                }
+            }
+        });
     }
 
     /**
      * Insert a W value to remote database.
      *
-     * @param W The W value to be inserted
+     * @param w The W value to be inserted
+     * @param listener A {@link ResultListener}
      */
-    public void insertW(int W) {
+    public void insertW(int w, @Nullable final ResultListener<String> listener) {
         Map<String, String> params = new HashMap<>();
-        params.put("w", String.valueOf(W));
+        params.put("id", Config.DEVICE_ID);
+        params.put("w", String.valueOf(w));
         post(Config.URL_INSERT_W, params, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, "insertW() Response: " + response);
+                if (listener != null) {
+                    listener.onGotResult(response);
+                }
             }
-        }, null);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "insertW(): " + error.toString());
+                if (listener != null) {
+                    listener.onError(error);
+                }
+            }
+        });
     }
 
     /**
      * Get all W values in remote database.
      *
-     * @param resListener Called when the result is got
-     * @param errListener Called when error occurs
+     * @param listener A {@link ResultListener}
      */
-    public void getAllW(final ResultListener<ArrayList<Integer>> resListener,
-                        Response.ErrorListener errListener) {
+    public void getAllW(@Nullable final ResultListener<ArrayList<String>> listener) {
         get(Config.URL_GET_ALL_W, null, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 Log.d(TAG, "getAllW() Response: " + response);
-                // TODO NETWORK Generate W values list from response
-                ArrayList<Integer> wValues = new ArrayList<>();
-                wValues.add(1);
-                wValues.add(2);
-                wValues.add(3);
-                resListener.onGotResult(wValues);
+                String[] vals = response.split(";");
+                if (listener != null) {
+                    listener.onGotResult(new ArrayList<>(Arrays.asList(vals)));
+                }
             }
-        }, errListener);
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "getAllW(): " + error.toString());
+                if (listener != null) {
+                    listener.onError(error);
+                }
+            }
+        });
     }
 
     /**
@@ -197,5 +231,12 @@ public class NetworkUtil {
          * @param result The result got
          */
         void onGotResult(T result);
+
+        /**
+         * Called when error occurs.
+         *
+         * @param err {@link VolleyError}
+         */
+        void onError(VolleyError err);
     }
 }

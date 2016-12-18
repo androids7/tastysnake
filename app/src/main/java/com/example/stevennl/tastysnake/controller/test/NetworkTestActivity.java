@@ -56,8 +56,18 @@ public class NetworkTestActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 int w = CommonUtil.randInt(9000);
-                networkUtil.insertW(CommonUtil.randInt(w));
                 infoTxt.append("Insert w: " + w + "\n");
+                networkUtil.insertW(CommonUtil.randInt(w), new NetworkUtil.ResultListener<String>() {
+                    @Override
+                    public void onGotResult(String result) {
+                        infoTxt.append(result + "\n");
+                    }
+
+                    @Override
+                    public void onError(VolleyError err) {
+                        infoTxt.append(err.toString() + "\n");
+                    }
+                });
             }
         });
     }
@@ -72,6 +82,11 @@ public class NetworkTestActivity extends BaseActivity {
                     public void onGotResult(Integer result) {
                         infoTxt.append("Avg W: " + result + "\n");
                     }
+
+                    @Override
+                    public void onError(VolleyError err) {
+                        infoTxt.append(err.toString() + "\n");
+                    }
                 });
             }
         });
@@ -82,23 +97,22 @@ public class NetworkTestActivity extends BaseActivity {
         getAllWBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                networkUtil.getAllW(new NetworkUtil.ResultListener<ArrayList<Integer>>() {
+                networkUtil.getAllW(new NetworkUtil.ResultListener<ArrayList<String>>() {
                     @Override
-                    public void onGotResult(ArrayList<Integer> result) {
+                    public void onGotResult(ArrayList<String> result) {
                         if (result.isEmpty()) {
                             infoTxt.append("W in remote DB: nothing\n");
                         } else {
                             infoTxt.append("W in remote DB:\n");
-                            for (Integer w : result) {
+                            for (String w : result) {
                                 infoTxt.append(w + "\n");
                             }
                         }
                     }
-                }, new Response.ErrorListener() {
+
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, error.toString());
-                        infoTxt.append(error.toString() + "\n");
+                    public void onError(VolleyError err) {
+                        infoTxt.append(err.toString() + "\n");
                     }
                 });
             }

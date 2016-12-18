@@ -11,13 +11,12 @@ import com.example.stevennl.tastysnake.Config;
  */
 public class SharedPrefUtil {
     private static final String TAG = "SharedPrefUtil";
-    private static final String PREF_APP = "TastySnake_shared_pref";
+    private static final String PREF_APP = "pref_conf";
     private static final String PREF_KEY_THEME_TYPE = "theme_type";
+    private static final String PREF_KEY_DEVICE_ID = "device_id";
 
     /**
      * Save current theme type.
-     *
-     * @param context The context
      */
     public static void saveThemeType(Context context) {
         SharedPreferences sp = context.getSharedPreferences(PREF_APP, Context.MODE_PRIVATE);
@@ -26,12 +25,26 @@ public class SharedPrefUtil {
 
     /**
      * Load current theme type.
-     *
-     * @param context The context
      */
     public static void loadThemeType(Context context) {
         SharedPreferences sp = context.getSharedPreferences(PREF_APP, Context.MODE_PRIVATE);
         int type = sp.getInt(PREF_KEY_THEME_TYPE, Config.ThemeType.LIGHT.ordinal());
         Config.theme = Config.ThemeType.values()[type];
+    }
+
+    /**
+     * Save device id.
+     */
+    public static void saveDeviceId(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(PREF_APP, Context.MODE_PRIVATE);
+        sp.edit().putString(PREF_KEY_DEVICE_ID, Config.DEVICE_ID).apply();
+    }
+
+    /**
+     * Load device id.
+     */
+    public static void loadDeviceId(Context context) {
+        SharedPreferences sp = context.getSharedPreferences(PREF_APP, Context.MODE_PRIVATE);
+        Config.DEVICE_ID = sp.getString(PREF_KEY_DEVICE_ID, null);
     }
 }

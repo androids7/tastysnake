@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.example.stevennl.tastysnake.Config;
 import com.example.stevennl.tastysnake.R;
 import com.example.stevennl.tastysnake.model.AnalysisData;
@@ -88,10 +89,15 @@ public class AnalysisFragment extends Fragment {
                 @Override
                 public void onGotResult(Integer result) {
                     Log.d(TAG, "Got avg W: " + result);
-                    // TODO NETWORK Compute U and show info
+                    // TODO DATA_ANALYSIS Compute U and show info
 //                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_exceed, 10));
 //                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_equal));
 //                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_below, 20));
+                }
+
+                @Override
+                public void onError(VolleyError err) {
+                    Log.e(TAG, err.toString());
                 }
             });
         }
