@@ -47,6 +47,8 @@
         <activity
             android:name=".controller.test.NetworkTestActivity"
             android:screenOrientation="portrait"/>
+
+        <service android:name=".util.network.UploadService" />
     </application>
 
 </manifest>
