@@ -9,7 +9,7 @@ import com.example.stevennl.tastysnake.TastySnakeApp;
 
 /**
  * Service to upload data to remote server. Started in {@link TastySnakeApp#initService()}.
- * Author:
+ * Author: QX
  */
 public class UploadService extends IntentService {
     private static final String TAG = "UploadService";

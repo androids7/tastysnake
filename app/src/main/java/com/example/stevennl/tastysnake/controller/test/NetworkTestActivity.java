@@ -52,7 +52,7 @@ public class NetworkTestActivity extends BaseActivity {
             public void onClick(View v) {
                 int w = CommonUtil.randInt(9000);
                 infoTxt.append("Insert w: " + w + "\n");
-                networkUtil.insertW(CommonUtil.randInt(w), new NetworkUtil.ResultListener<String>() {
+                networkUtil.insertW(w, new NetworkUtil.ResultListener<String>() {
                     @Override
                     public void onGotResult(String result) {
                         infoTxt.append(result + "\n");
