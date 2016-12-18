@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.example.stevennl.tastysnake.util.CommonUtil;
 import com.example.stevennl.tastysnake.util.SharedPrefUtil;
+import com.example.stevennl.tastysnake.util.network.UploadService;
 
 import java.util.UUID;
 
@@ -14,8 +15,13 @@ public class TastySnakeApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        SharedPrefUtil.loadThemeType(this);
+        initTheme();
         initDeviceId();
+        initService();
+    }
+
+    private void initTheme() {
+        SharedPrefUtil.loadThemeType(this);
     }
 
     private void initDeviceId() {
@@ -25,5 +31,11 @@ public class TastySnakeApp extends Application {
             SharedPrefUtil.saveDeviceId(this);
         }
         Log.d(TAG, "Device Id: " + Config.DEVICE_ID);
+    }
+
+    private void initService() {
+        if (!UploadService.isAlarmOn()) {
+            UploadService.setAlarm(this, true);
+        }
     }
 }

@@ -16,7 +16,7 @@ import com.example.stevennl.tastysnake.Config;
 import com.example.stevennl.tastysnake.R;
 import com.example.stevennl.tastysnake.model.AnalysisData;
 import com.example.stevennl.tastysnake.util.CommonUtil;
-import com.example.stevennl.tastysnake.util.NetworkUtil;
+import com.example.stevennl.tastysnake.util.network.NetworkUtil;
 
 /**
  * Data analysis page.
@@ -27,7 +27,7 @@ public class AnalysisFragment extends Fragment {
     private GameActivity act;
     private Handler handler;
     private NetworkUtil networkUtil;
-
+    private AnalysisData data;
     private TextView infoTxt;
 
     @Override
@@ -41,6 +41,7 @@ public class AnalysisFragment extends Fragment {
         super.onCreate(savedInstanceState);
         handler = new Handler();
         networkUtil = NetworkUtil.getInstance(act);
+        data = AnalysisData.create(act);
     }
 
     @Override
@@ -70,7 +71,6 @@ public class AnalysisFragment extends Fragment {
         infoTxt = (TextView) v.findViewById(R.id.analysis_infoTxt);
         infoTxt.setVisibility(View.GONE);
         String info;
-        AnalysisData data = AnalysisData.create(act);
         if (data != null) {
             info = getString(R.string.analysis_local, data.N, data.X, data.A,
                     data.B, data.Y, data.C, data.D, data.T, data.L1, data.L2, data.W, data.P);
@@ -89,10 +89,12 @@ public class AnalysisFragment extends Fragment {
                 @Override
                 public void onGotResult(Integer result) {
                     Log.d(TAG, "Got avg W: " + result);
-                    // TODO DATA_ANALYSIS Compute U and show info
-//                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_exceed, 10));
-//                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_equal));
-//                    infoTxt.append("\n\n" + getString(R.string.analysis_remote_below, 20));
+                    if (data != null) {
+                        // TODO DATA_ANALYSIS: Compute U and show info
+//                        infoTxt.append("\n\n" + getString(R.string.analysis_remote_exceed, 10));
+//                        infoTxt.append("\n\n" + getString(R.string.analysis_remote_equal));
+//                        infoTxt.append("\n\n" + getString(R.string.analysis_remote_below, 20));
+                    }
                 }
 
                 @Override

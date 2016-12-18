@@ -1,4 +1,4 @@
-package com.example.stevennl.tastysnake.util;
+package com.example.stevennl.tastysnake.util.network;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Manage HTTP request. Implemented as a singleton.

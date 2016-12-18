@@ -10,6 +10,7 @@ public class Config {
     public static final int FREQUENCY_DRAW = 20;  // ms
     public static final int FREQUENCY_MOVE = 80;  // ms
     public static final int FREQUENCY_FOOD = 500;  // ms
+    public static final int FREQUENCY_UPLOAD = 10000;  // ms
 
     public static final int DELAY_HOME_FRAG = 600;  // ms
     public static final int DELAY_HOME_FINISH = 200;  // ms

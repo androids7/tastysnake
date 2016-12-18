@@ -1,22 +1,17 @@
 package com.example.stevennl.tastysnake.controller.test;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.example.stevennl.tastysnake.Config;
 import com.example.stevennl.tastysnake.R;
 import com.example.stevennl.tastysnake.base.BaseActivity;
 import com.example.stevennl.tastysnake.util.CommonUtil;
-import com.example.stevennl.tastysnake.util.NetworkUtil;
+import com.example.stevennl.tastysnake.util.network.NetworkUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class NetworkTestActivity extends BaseActivity {
     private static final String TAG = "NetworkTestActivity";
