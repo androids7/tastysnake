@@ -1,11 +1,15 @@
 package com.example.stevennl.tastysnake.util.network;
 
+import android.app.AlarmManager;
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.example.stevennl.tastysnake.Config;
 import com.example.stevennl.tastysnake.TastySnakeApp;
+import com.example.stevennl.tastysnake.model.AnalysisData;
 
 /**
  * Service to upload data to remote server. Started in {@link TastySnakeApp#initService()}.
@@ -28,7 +32,11 @@ public class UploadService extends IntentService {
             Log.d(TAG, "Network unavailable");
         } else {
             Log.d(TAG, "Network available");
-            // TODO UploadService: Send latest W value to remote server
+            AnalysisData data = AnalysisData.create(this);
+            if (data == null)
+                return;
+            NetworkUtil networkUtil = NetworkUtil.getInstance(this);
+            networkUtil.insertW(data.W, null);
         }
     }
 
@@ -39,14 +47,23 @@ public class UploadService extends IntentService {
      * @param on True to start the alarm, false to stop it.
      */
     public static void setAlarm(Context context, boolean on) {
-        // TODO UploadService: setAlarm()
+        Intent i = new Intent(context, UploadService.class);
+        PendingIntent pi = PendingIntent.getService(context, 0, i, 0);
+        AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        if (on) {
+            am.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), Config.FREQUENCY_UPLOAD, pi);
+        } else {
+            am.cancel(pi);
+            pi.cancel();
+        }
     }
 
     /**
      * Return true if the service alarm is on.
      */
-    public static boolean isAlarmOn() {
-        // TODO UploadService: isAlarmOn()
-        return false;
+    public static boolean isAlarmOn(Context context) {
+        Intent i = new Intent(context, UploadService.class);
+        PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_NO_CREATE);
+        return pi != null;
     }
 }

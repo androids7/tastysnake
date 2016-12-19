@@ -90,10 +90,15 @@ public class AnalysisFragment extends Fragment {
                 public void onGotResult(Integer result) {
                     Log.d(TAG, "Got avg W: " + result);
                     if (data != null) {
-                        // TODO DATA_ANALYSIS: Compute U and show info
-//                        infoTxt.append("\n\n" + getString(R.string.analysis_remote_exceed, 10));
-//                        infoTxt.append("\n\n" + getString(R.string.analysis_remote_equal));
-//                        infoTxt.append("\n\n" + getString(R.string.analysis_remote_below, 20));
+                        if (data.W > result) {
+                            int U = 100 * (data.W - result) / result;
+                            infoTxt.append("\n\n" + getString(R.string.analysis_remote_exceed, U));
+                        } else if (data.W == result) {
+                            infoTxt.append("\n\n" + getString(R.string.analysis_remote_equal));
+                        } else if (data.W < result) {
+                            int U = 100 * (result - data.W) / result;
+                            infoTxt.append("\n\n" + getString(R.string.analysis_remote_below, U));
+                        }
                     }
                 }
 
