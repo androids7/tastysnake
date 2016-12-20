@@ -89,7 +89,7 @@ public class AnalysisFragment extends Fragment {
                 @Override
                 public void onGotResult(Integer result) {
                     Log.d(TAG, "Got avg W: " + result);
-                    if (data != null) {
+                    if (data != null && result != 0) {
                         if (data.W > result) {
                             int U = 100 * (data.W - result) / result;
                             infoTxt.append("\n\n" + getString(R.string.analysis_remote_exceed, U));

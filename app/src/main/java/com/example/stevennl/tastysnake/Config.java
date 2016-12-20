@@ -43,6 +43,8 @@ public class Config {
     public static final String URL_REMOVE_ALL_W = "http://108.61.246.103:9000/w/clear";
     public static final int REQ_TIMEOUT = 3000;
 
+    public static final int UPLOAD_THRESHHOLD = 5;
+
     public static String DEVICE_ID = null;
 
     public enum ThemeType {LIGHT, DARK}

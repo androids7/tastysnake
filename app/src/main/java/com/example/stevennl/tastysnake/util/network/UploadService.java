@@ -56,7 +56,7 @@ public class UploadService extends IntentService {
         } else {
             Log.d(TAG, "Network available");
             AnalysisData data = AnalysisData.create(this);
-            if (data == null) {
+            if (data == null || data.N < Config.UPLOAD_THRESHHOLD) {
                 return;
             }
             Log.d(TAG, "Insert W: " + data.W);
