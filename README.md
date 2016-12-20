@@ -2,6 +2,10 @@
 
 A snake battle game on Android.
 
+## APK
+
+* [TastySnake_1.0.0.161220_beta.apk](./apk/TastySnake_1.0.0.161220_beta.apk)
+
 ## Documentation
 
 1. [module](./doc/module.md)

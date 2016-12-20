@@ -24,6 +24,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".controller.game.GameActivity"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
             android:name=".controller.test.BluetoothTestActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -31,9 +35,6 @@
             android:screenOrientation="landscape" />
         <activity
             android:name=".controller.test.SensorTestActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".controller.game.GameActivity"
             android:screenOrientation="landscape" />
         <activity
             android:name=".controller.test.PacketTestActivity"
