@@ -17,6 +17,7 @@ public class NetworkTestActivity extends BaseActivity {
     private static final String TAG = "NetworkTestActivity";
     private NetworkUtil networkUtil;
     private TextView infoTxt;
+    private int clickCnt = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,7 @@ public class NetworkTestActivity extends BaseActivity {
         initInsertWBtn();
         initGetAvgWBtn();
         initGetAllWBtn();
+        initRemoveWBtn();
         initRemoveAllBtn();
     }
 
@@ -115,12 +117,12 @@ public class NetworkTestActivity extends BaseActivity {
         });
     }
 
-    private void initRemoveAllBtn() {
-        Button removeAllWBtn = (Button) findViewById(R.id.req_test_removeAllWBtn);
-        removeAllWBtn.setOnClickListener(new View.OnClickListener() {
+    private void initRemoveWBtn() {
+        Button removeWBtn = (Button) findViewById(R.id.req_test_removeWBtn);
+        removeWBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                networkUtil.removeAllW(new NetworkUtil.ResultListener<String>() {
+                networkUtil.removeW(new NetworkUtil.ResultListener<String>() {
                     @Override
                     public void onGotResult(String result) {
                         infoTxt.append(result + "\n");
@@ -131,6 +133,31 @@ public class NetworkTestActivity extends BaseActivity {
                         infoTxt.append(err.toString() + "\n");
                     }
                 });
+            }
+        });
+    }
+
+    private void initRemoveAllBtn() {
+        Button removeAllWBtn = (Button) findViewById(R.id.req_test_removeAllWBtn);
+        removeAllWBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (clickCnt++ < 3) {
+                    infoTxt.append(getString(R.string.danger_operation) + "\n");
+                } else {
+                    clickCnt = 0;
+                    networkUtil.removeAllW(new NetworkUtil.ResultListener<String>() {
+                        @Override
+                        public void onGotResult(String result) {
+                            infoTxt.append(result + "\n");
+                        }
+
+                        @Override
+                        public void onError(VolleyError err) {
+                            infoTxt.append(err.toString() + "\n");
+                        }
+                    });
+                }
             }
         });
     }

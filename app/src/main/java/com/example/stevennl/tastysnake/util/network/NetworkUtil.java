@@ -160,6 +160,33 @@ public class NetworkUtil {
     }
 
     /**
+     * Remove W value of current device in remote database.
+     *
+     * @param listener A {@link ResultListener}
+     */
+    public void removeW(@Nullable final ResultListener<String> listener) {
+        Map<String, String> params = new HashMap<>();
+        params.put("id", Config.DEVICE_ID);
+        get(Config.URL_REMOVE_W, params, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "removeW() response: " + response);
+                if (listener != null) {
+                    listener.onGotResult(response);
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "removeW(): " + error.toString());
+                if (listener != null) {
+                    listener.onError(error);
+                }
+            }
+        });
+    }
+
+    /**
      * Remove all W values in remote database.
      *
      * @param listener A {@link ResultListener}
@@ -214,6 +241,7 @@ public class NetworkUtil {
     public void get(String url, Map<String, String> params,
                     Response.Listener<String> resListener, Response.ErrorListener errListener) {
         String getUrl = buildUrl(url, params);
+        Log.d(TAG, "Get url: " + getUrl);
         StringRequest req = new StringRequest(getUrl, resListener, errListener);
         req.setRetryPolicy(new DefaultRetryPolicy(Config.REQ_TIMEOUT,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));

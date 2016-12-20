@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.android.volley.VolleyError;
 import com.example.stevennl.tastysnake.Config;
-import com.example.stevennl.tastysnake.TastySnakeApp;
 import com.example.stevennl.tastysnake.model.AnalysisData;
 
 /**
@@ -56,7 +55,7 @@ public class UploadService extends IntentService {
         } else {
             Log.d(TAG, "Network available");
             AnalysisData data = AnalysisData.create(this);
-            if (data == null || data.N < Config.UPLOAD_THRESHHOLD) {
+            if (data == null || data.N < Config.UPLOAD_THRESHOLD) {
                 return;
             }
             Log.d(TAG, "Insert W: " + data.W);

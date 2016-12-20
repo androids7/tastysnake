@@ -36,14 +36,16 @@ public class Config {
     public static final int BLUETOOTH_DISCOVERABLE_TIME = 180;  // s
     public static final int BLUETOOTH_DISCOVER_TIME = 5000;  // ms
 
-//    public static final String URL_INSERT_W = "http://192.168.199.105/api/testReq";
-    public static final String URL_INSERT_W = "http://108.61.246.103:9000/w";
-    public static final String URL_GET_AVG_W = "http://108.61.246.103:9000/w/mean";
-    public static final String URL_GET_ALL_W = "http://108.61.246.103:9000/w/all";
-    public static final String URL_REMOVE_ALL_W = "http://108.61.246.103:9000/w/clear";
+//    private static final String SERVER_IP = "http://192.168.199.105";
+    private static final String SERVER_IP = "http://108.61.246.103:9000";
+    public static final String URL_INSERT_W = SERVER_IP + "/w";
+    public static final String URL_GET_AVG_W = SERVER_IP + "/w/mean";
+    public static final String URL_GET_ALL_W = SERVER_IP + "/w/all";
+    public static final String URL_REMOVE_ALL_W = SERVER_IP + "/w/clear";
+    public static final String URL_REMOVE_W = SERVER_IP + "/w/remove";
     public static final int REQ_TIMEOUT = 3000;
 
-    public static final int UPLOAD_THRESHHOLD = 5;
+    public static final int UPLOAD_THRESHOLD = 5;
 
     public static String DEVICE_ID = null;
 

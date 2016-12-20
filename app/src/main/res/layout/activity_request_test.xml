@@ -35,6 +35,17 @@
             android:layout_height="wrap_content"
             android:id="@+id/req_test_getAllWBtn"
             android:text="@string/get_all_w"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/req_test_removeWBtn"
+            android:text="@string/remove_w"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
