@@ -4,6 +4,7 @@
     <string name="insert_w">Insert W</string>
     <string name="get_all_w">Get All W</string>
     <string name="get_avg_w">Get Avg W</string>
+    <string name="remove_all_w">Remove All W</string>
     <string name="generate">Gen</string>
     <string name="remove_all">Remove All</string>
     <string name="connect">Connect</string>

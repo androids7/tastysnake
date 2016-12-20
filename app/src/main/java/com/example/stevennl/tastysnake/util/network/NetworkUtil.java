@@ -82,7 +82,7 @@ public class NetworkUtil {
         get(Config.URL_GET_AVG_W, null, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "getAvgW() Response: " + response);
+                Log.d(TAG, "getAvgW() response: " + response);
                 int avgW = 0;
                 try {
                     avgW = Integer.parseInt(response);
@@ -117,7 +117,7 @@ public class NetworkUtil {
         post(Config.URL_INSERT_W, params, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "insertW() Response: " + response);
+                Log.d(TAG, "insertW() response: " + response);
                 if (listener != null) {
                     listener.onGotResult(response);
                 }
@@ -142,10 +142,35 @@ public class NetworkUtil {
         get(Config.URL_GET_ALL_W, null, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d(TAG, "getAllW() Response: " + response);
+                Log.d(TAG, "getAllW() response: " + response);
                 String[] vals = response.split(";");
                 if (listener != null) {
                     listener.onGotResult(new ArrayList<>(Arrays.asList(vals)));
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "getAllW(): " + error.toString());
+                if (listener != null) {
+                    listener.onError(error);
+                }
+            }
+        });
+    }
+
+    /**
+     * Remove all W values in remote database.
+     *
+     * @param listener A {@link ResultListener}
+     */
+    public void removeAllW(@Nullable final ResultListener<String> listener) {
+        get(Config.URL_REMOVE_ALL_W, null, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d(TAG, "removeAllW() response: " + response);
+                if (listener != null) {
+                    listener.onGotResult(response);
                 }
             }
         }, new Response.ErrorListener() {

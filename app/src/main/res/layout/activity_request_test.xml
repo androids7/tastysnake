@@ -35,5 +35,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/req_test_getAllWBtn"
             android:text="@string/get_all_w"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/req_test_removeAllWBtn"
+            android:text="@string/remove_all_w"/>
     </LinearLayout>
 </LinearLayout>

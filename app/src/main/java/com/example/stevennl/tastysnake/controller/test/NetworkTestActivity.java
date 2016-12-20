@@ -27,6 +27,7 @@ public class NetworkTestActivity extends BaseActivity {
         initInsertWBtn();
         initGetAvgWBtn();
         initGetAllWBtn();
+        initRemoveAllBtn();
     }
 
     @Override
@@ -103,6 +104,26 @@ public class NetworkTestActivity extends BaseActivity {
                                 infoTxt.append(w);
                             }
                         }
+                    }
+
+                    @Override
+                    public void onError(VolleyError err) {
+                        infoTxt.append(err.toString() + "\n");
+                    }
+                });
+            }
+        });
+    }
+
+    private void initRemoveAllBtn() {
+        Button removeAllWBtn = (Button) findViewById(R.id.req_test_removeAllWBtn);
+        removeAllWBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                networkUtil.removeAllW(new NetworkUtil.ResultListener<String>() {
+                    @Override
+                    public void onGotResult(String result) {
+                        infoTxt.append(result + "\n");
                     }
 
                     @Override

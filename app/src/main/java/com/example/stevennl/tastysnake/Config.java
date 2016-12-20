@@ -40,6 +40,7 @@ public class Config {
     public static final String URL_INSERT_W = "http://108.61.246.103:9000/w";
     public static final String URL_GET_AVG_W = "http://108.61.246.103:9000/w/mean";
     public static final String URL_GET_ALL_W = "http://108.61.246.103:9000/w/all";
+    public static final String URL_REMOVE_ALL_W = "http://108.61.246.103:9000/w/clear";
     public static final int REQ_TIMEOUT = 3000;
 
     public static String DEVICE_ID = null;
