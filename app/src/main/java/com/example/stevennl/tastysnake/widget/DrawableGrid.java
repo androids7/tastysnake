@@ -26,7 +26,7 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
 
     private int rowCount = 1;
     private int colCount = 1;
-    private int bgColor = Config.COLOR_MAP_BG;
+    private volatile int bgColor = Config.COLOR_MAP_BG;
     private boolean showGridLine = false;
 
     private int horInterval = 0;
@@ -34,7 +34,7 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
     private int horOffset = 0;
     private int verOffset = 0;
 
-    private Map map;
+    private volatile Map map;
     private Paint paint;
     private boolean drawing;
 

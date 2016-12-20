@@ -22,19 +22,13 @@ public class ConnectedThread extends Thread {
     private final InputStream inStream;
     private final OutputStream outStream;
     private final OnStateChangedListener stateListener;
-    private OnErrorListener errorListener;
-    private OnDataReceiveListener dataListener;
+    private volatile OnErrorListener errorListener;
+    private volatile OnDataReceiveListener dataListener;
 
-    /**
-     * Set an {@link OnDataReceiveListener}.
-     */
     public void setDataListener(OnDataReceiveListener dataListener) {
         this.dataListener = dataListener;
     }
 
-    /**
-     * Set an {@link OnErrorListener}.
-     */
     public void setErrorListener(OnErrorListener errorListener) {
         this.errorListener = errorListener;
     }
