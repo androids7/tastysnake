@@ -16,7 +16,6 @@ public class TastySnakeApp extends Application {
         super.onCreate();
         initTheme();
         initDeviceId();
-        initService();
     }
 
     private void initTheme() {
@@ -30,11 +29,5 @@ public class TastySnakeApp extends Application {
             SharedPrefUtil.saveDeviceId(this);
         }
         Log.d(TAG, "Device Id: " + Config.DEVICE_ID);
-    }
-
-    private void initService() {
-        if (!UploadService.isAlarmOn(this)) {
-            UploadService.setAlarm(this, true);
-        }
     }
 }

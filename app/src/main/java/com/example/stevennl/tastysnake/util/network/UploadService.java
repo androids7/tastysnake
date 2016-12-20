@@ -7,22 +7,45 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.android.volley.VolleyError;
 import com.example.stevennl.tastysnake.Config;
 import com.example.stevennl.tastysnake.TastySnakeApp;
 import com.example.stevennl.tastysnake.model.AnalysisData;
 
 /**
- * Service to upload data to remote server. Started in {@link TastySnakeApp#initService()}.
+ * Service to upload data to remote server.
  * Author: QX
  */
 public class UploadService extends IntentService {
     private static final String TAG = "UploadService";
 
-    /**
-     * Initialize.
-     */
     public UploadService() {
         super(TAG);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d(TAG, "onCreate() called");
+    }
+
+    @Override
+    public void onStart(Intent intent, int startId) {
+        super.onStart(intent, startId);
+        Log.d(TAG, "onStart() called");
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        int val = super.onStartCommand(intent, flags, startId);
+        Log.d(TAG, "onStartCommand() called");
+        return val;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy() called");
     }
 
     @Override
@@ -33,10 +56,21 @@ public class UploadService extends IntentService {
         } else {
             Log.d(TAG, "Network available");
             AnalysisData data = AnalysisData.create(this);
-            if (data == null)
+            if (data == null) {
                 return;
-            NetworkUtil networkUtil = NetworkUtil.getInstance(this);
-            networkUtil.insertW(data.W, null);
+            }
+            Log.d(TAG, "Insert W: " + data.W);
+            NetworkUtil.getInstance(this).insertW(data.W, new NetworkUtil.ResultListener<String>() {
+                @Override
+                public void onGotResult(String result) {
+                    Log.d(TAG, "Response: " + result);
+                }
+
+                @Override
+                public void onError(VolleyError err) {
+                    Log.e(TAG, err.toString());
+                }
+            });
         }
     }
 
