@@ -3,7 +3,6 @@ package com.example.stevennl.tastysnake;
 import android.app.Application;
 import android.util.Log;
 
-import com.example.stevennl.tastysnake.util.CommonUtil;
 import com.example.stevennl.tastysnake.util.SharedPrefUtil;
 import com.example.stevennl.tastysnake.util.network.UploadService;
 
@@ -34,7 +33,7 @@ public class TastySnakeApp extends Application {
     }
 
     private void initService() {
-        if (!UploadService.isAlarmOn()) {
+        if (!UploadService.isAlarmOn(this)) {
             UploadService.setAlarm(this, true);
         }
     }
