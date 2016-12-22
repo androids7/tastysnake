@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -55,6 +56,7 @@ public class ConnectFragment extends Fragment {
 
     private ArrayList<BluetoothDevice> devices;
 
+    private ViewGroup rootView;
     private TextView titleTxt;
     private ListViewAdapter adapter;
     private SwipeRefreshLayout refreshLayout;
@@ -80,6 +82,7 @@ public class ConnectFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_connect, container, false);
+        initRootView(v);
         initTitleTxt(v);
         initListView(v);
         initRefreshLayout(v);
@@ -100,6 +103,18 @@ public class ConnectFragment extends Fragment {
         manager.unregisterDiscoveryReceiver(act);
         manager.cancelDiscovery();
         refreshLayout.setRefreshing(false);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "onConfigurationChanged() called");
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            rootView.setVisibility(View.VISIBLE);
+        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            rootView.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void initListeners() {
@@ -132,6 +147,10 @@ public class ConnectFragment extends Fragment {
                 handleErr(code);
             }
         };
+    }
+
+    private void initRootView(View v) {
+        rootView = (ViewGroup) v.findViewById(R.id.connect_root_view);
     }
 
     private void initTitleTxt(View v) {
@@ -345,7 +364,6 @@ public class ConnectFragment extends Fragment {
         }
         switch (code) {
             case OnErrorListener.ERR_SERVER_SOCKET_ACCEPT:
-                manager.runServerAsync(stateListener, errorListener);
                 break;
             case OnErrorListener.ERR_CLIENT_SOCKET_CONNECT:
                 handler.obtainMessage(SafeHandler.MSG_ERR,
