@@ -1,5 +1,6 @@
 package com.example.stevennl.tastysnake.controller.game;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import com.example.stevennl.tastysnake.util.bluetooth.listener.OnErrorListener;
 import com.example.stevennl.tastysnake.util.sensor.SensorController;
 import com.example.stevennl.tastysnake.widget.DrawableGrid;
 import com.example.stevennl.tastysnake.widget.HelpDialog;
+import com.example.stevennl.tastysnake.widget.SnakeImage;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
@@ -70,6 +72,8 @@ public class BattleFragment extends Fragment {
     private int duration;  // Duration(seconds) of one battle
     private boolean attacking;
     private Snake.Type nextAttacker = Snake.Type.CLIENT;
+
+    private int backPressCnt = 0;
 
     // Debug fields
     private int recvCnt = 0;
@@ -256,6 +260,17 @@ public class BattleFragment extends Fragment {
     private void initRoleTxt(View v) {
         roleTxt = (TextView) v.findViewById(R.id.battle_roleTxt);
         updateRoleTxt();
+    }
+
+    /**
+     * Called when the back button is pressed.
+     */
+    public void onBackPressed() {
+        if (++backPressCnt < 2) {
+            CommonUtil.showToast(act, R.string.back_press_double);
+        } else {
+            act.replaceFragment(new HomeFragment(), true);
+        }
     }
 
     /**

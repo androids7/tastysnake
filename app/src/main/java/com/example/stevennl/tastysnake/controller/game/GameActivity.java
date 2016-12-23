@@ -47,6 +47,8 @@ public class GameActivity extends SingleFragmentActivity {
                     ((HomeFragment)fragment).onBackPressed();
                 } else if (className.equals(ConnectFragment.class.getName())) {
                     ((ConnectFragment)fragment).onBackPressed();
+                } else if (className.equals(BattleFragment.class.getName())) {
+                    ((BattleFragment)fragment).onBackPressed();
                 } else {
                     replaceFragment(new HomeFragment(), true);
                 }

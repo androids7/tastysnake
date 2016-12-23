@@ -70,6 +70,7 @@
     <string name="wait_connecting">正在连接设备！请等待！</string>
     <string name="connect_exception">连接异常！Code: %1$d</string>
     <string name="danger_operation">别激动！这会删掉数据库全部内容！</string>
+    <string name="back_press_double">再按一次将退出游戏</string>
 
     <!-- Testing -->
     <string name="bluetooth_test">Test Bluetooth</string>
