@@ -205,6 +205,8 @@ public class ConnectFragment extends Fragment {
      * Called when the back button is pressed.
      */
     public void onBackPressed() {
+        manager.stopServer();
+        manager.stopConnect();
         mySnakeImg.cancelAnim();
         enemySnakeImg.cancelAnim();
         mySnakeImg.startExit(null);
@@ -212,8 +214,6 @@ public class ConnectFragment extends Fragment {
             @Override
             public void onAnimationEnd(Animator animation) {
                 if (isAdded()) {
-                    manager.stopServer();
-                    manager.stopConnect();
                     act.replaceFragment(new HomeFragment(), true);
                 }
             }

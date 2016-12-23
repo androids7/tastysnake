@@ -234,7 +234,7 @@ public class BattleFragment extends Fragment {
         grid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isServer() && !gameStarted) {
+                if (isServer() && !gameStarted && mePrepared && enemyPrepared) {
                     gameStarted = true;
                     sendThread.send(Packet.restart(nextAttacker));
                     attacking = (type == nextAttacker);
