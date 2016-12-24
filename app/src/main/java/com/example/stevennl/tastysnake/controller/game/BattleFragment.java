@@ -1,6 +1,5 @@
 package com.example.stevennl.tastysnake.controller.game;
 
-import android.animation.Animator;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -67,6 +66,8 @@ public class BattleFragment extends Fragment {
     private boolean enemyPrepared = false;
 
     private boolean gameStarted = false;
+    private boolean stopped = false;  // Whether onStop() is called
+
     private int timeRemain;
     private int duration;  // Duration(seconds) of one battle
     private boolean attacking;
@@ -124,21 +125,36 @@ public class BattleFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        sensorCtrl.register();
+        Log.d(TAG, "onResume()");
+        if (stopped) {
+            if (helpDialog.isShowing()) {
+                helpDialog.dismiss();
+            }
+            act.replaceFragment(new HomeFragment(), true);
+        } else {
+            sensorCtrl.register();
+            grid.setPause(false);
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        Log.d(TAG, "onPause()");
         sensorCtrl.unregister();
+        grid.setPause(true);
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onStop() {
+        super.onStop();
+        stopped = true;
         manager.stopConnect();
-        sendThread.quitSafely();
         stopGame(false);
+        if (sendThread != null) {
+            sendThread.quitSafely();
+            sendThread = null;
+        }
     }
 
     private void initHandler() {
@@ -514,7 +530,7 @@ public class BattleFragment extends Fragment {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        if (isAdded()) {
+                        if (isAdded() && !stopped) {
                             if (helpDialog.isShowing()) {
                                 helpDialog.dismiss();
                             }

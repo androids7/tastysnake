@@ -24,29 +24,28 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
 
     private int rowCount = 1;
     private int colCount = 1;
-    private volatile int bgColor = Config.COLOR_MAP_BG;
-    private boolean showGridLine = false;
-
     private volatile Map map;
-    private Paint paint;
+
+    private boolean showGridLine = false;
+    private volatile int bgColor = Config.COLOR_MAP_BG;
 
     private DrawThread drawThread;
 
-    /**
-     * Set the map to be drawn.
-     */
     public void setMap(Map map) {
-        Log.d(TAG, "setMap() called.");
+        Log.d(TAG, "setMap()");
         this.map = map;
         this.rowCount = map.getRowCount();
         this.colCount = map.getColCount();
     }
 
-    /**
-     * Set the background color.
-     */
     public void setBgColor(int bgColor) {
         this.bgColor = bgColor;
+    }
+
+    public void setPause(boolean pause) {
+        if (drawThread != null && drawThread.isAlive()) {
+            drawThread.setPause(pause);
+        }
     }
 
     /**
@@ -66,28 +65,18 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
      */
     public DrawableGrid(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        Log.d(TAG, "Constructor called.");
+        Log.d(TAG, "DrawableGrid()");
         if (attrs != null) {
             initCustomAttr(context, attrs);
         }
-        initSurfaceView();
-        initPaint();
+        setKeepScreenOn(true);
+        getHolder().addCallback(this);
     }
 
     private void initCustomAttr(Context context, AttributeSet attrs) {
         TypedArray arr = context.obtainStyledAttributes(attrs, R.styleable.DrawableGridAttr);
         showGridLine = arr.getBoolean(R.styleable.DrawableGridAttr_showGridLine, false);
         arr.recycle();
-    }
-
-    private void initSurfaceView() {
-        setKeepScreenOn(true);
-        getHolder().addCallback(this);
-    }
-
-    private void initPaint() {
-        paint = new Paint();
-        paint.setAntiAlias(true);
     }
 
     @Override
@@ -106,14 +95,16 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d(TAG, "surfaceDestroyed()");
-        drawThread.stopDraw();
+        drawThread.setRunning(false);
     }
 
     private class DrawThread extends Thread {
         private SurfaceHolder holder_;
         private Canvas canvas;
+        private Paint paint;
 
-        private volatile boolean canDraw = true;
+        private volatile boolean running = true;
+        private volatile boolean pause = false;
 
         private volatile int horInterval = 0;
         private volatile int verInterval = 0;
@@ -123,10 +114,17 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
         private DrawThread(SurfaceHolder holder_) {
             super(TAG + "Thread");
             this.holder_ = holder_;
+            paint = new Paint();
+            paint.setAntiAlias(true);
+            updateParams();
         }
 
-        private void stopDraw() {
-            canDraw = false;
+        private void setRunning(boolean running) {
+            this.running = running;
+        }
+
+        private void setPause(boolean pause) {
+            this.pause = pause;
         }
 
         private void updateParams() {
@@ -146,11 +144,12 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
 
         @Override
         public void run() {
-            updateParams();
-            while (canDraw) {
+            while (running) {
                 try {
-                    draw();
-                    Thread.sleep(Config.FREQUENCY_DRAW);
+                    if (!pause) {
+                        draw();
+                        Thread.sleep(Config.FREQUENCY_DRAW);
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "", e);
                 }
@@ -178,7 +177,6 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
             float left, top, right, bottom;
             for (int i = 0; i < rowCount; ++i) {
                 for (int j = 0; j < colCount; ++j) {
-                    if (!canDraw) return;
                     Point point = map.getPoint(i, j);
                     if (showGridLine || point.getType() != Point.Type.BLANK) {
                         paint.setColor(point.getColor());
@@ -206,7 +204,6 @@ public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback 
          */
         private void drawGrid(float left, float top, float right, float bottom,
                               Point.Type type, Canvas canvas) {
-            if (!canDraw) return;
             final float centerHor = (left + right) / 2;
             final float centerVer = (top + bottom) / 2;
             final float gridWidth = right - left;
