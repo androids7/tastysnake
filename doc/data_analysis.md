@@ -48,7 +48,7 @@ W = (100/N)\*((7\*A+5\*B)\*(18-log2(T+1))+(1\*C+3\*D)\*log2(T+2))
 |白银|1500 <= W < 3800|
 |青铜|W < 1500|
 
-Use [formula_test.m](./formula_test.m)(MATLAB) to test W and P.
+Use [formula_test.m](./program/formula_test.m)(MATLAB) to test W and P.
 
 ## Remote
 

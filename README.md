@@ -1,20 +1,36 @@
 # TastySnake
 
-A snake battle game on Android.
+A snake battle game on Android. 
 
-## Release
+The move direction of the snake is controlled by gravity sensor and the two devices communicate with each other through bluetooth.
 
-See [release](./release/release.md).
+## Demo
+
+![](./doc/img/demo_light.gif)
+
+![](./doc/img/demo_dark.gif)
 
 ## Documentation
 
-* [module](./doc/module.md)
+* [Module](./doc/module.md)
 
-* [database](./doc/database.md)
+* [Database](./doc/database.md)
 
-* [data_analysis](./doc/data_analysis.md)
+* [Data Analysis](./doc/data_analysis.md)
 
-* [packet](./doc/packet.md)
+* [Custom Packet](./doc/packet.md)
+
+## Release
+
+* [TastySnake_1.0.0.161220.apk](./apk/TastySnake_1.0.0.161220.apk)
+
+    * First release
+
+* [TastySnake_1.0.1.161222.apk](./apk/TastySnake_1.0.1.161222.apk)
+
+    * Fix connection bugs
+
+    * Fix dialog bugs in Meizu
 
 ## License
 

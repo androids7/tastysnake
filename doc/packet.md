@@ -1,4 +1,4 @@
-# Packet
+# Custom Packet
 
 Custom packet to transfer data through bluetooth.
 
