@@ -16,7 +16,6 @@ import com.example.stevennl.tastysnake.R;
 
 /**
  * A dialog showing game help information.
- * Author: Yifeng Wong
  */
 public class HelpDialog extends Dialog {
     private static final String TAG = "HelpDialog";

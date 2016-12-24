@@ -46,6 +46,8 @@ Author: [@stevennL](https://github.com/stevennL)
 
 Source: [BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/BluetoothManager.java)
 
+Reference: [Android Developer-bluetooth](https://developer.android.com/guide/topics/connectivity/bluetooth.html)
+
 * Based on android.bluetooth.BluetoothAdapter
 
 * Server: [AcceptThread](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/AcceptThread.java)
@@ -54,7 +56,7 @@ Source: [BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastys
 
 * Data Channel: [ConnectedThread](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/ConnectedThread.java)
 
-* Custom [packet](./packet.md)
+* [Custom Packet](./custom_packet.md)
 
 ## Sensor
 

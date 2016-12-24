@@ -2,7 +2,6 @@ package com.example.stevennl.tastysnake.util.bluetooth.listener;
 
 /**
  * Listener for errors during connection.
- * Author: LCY
  */
 public interface OnErrorListener {
     int ERR_SOCKET_CREATE = 1;

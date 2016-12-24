@@ -18,7 +18,6 @@ import com.example.stevennl.tastysnake.model.Direction;
 
 /**
  * A snake image with animation.
- * Author: LCY
  */
 public class SnakeImage extends ImageView {
     private static final String TAG = "SnakeImage";

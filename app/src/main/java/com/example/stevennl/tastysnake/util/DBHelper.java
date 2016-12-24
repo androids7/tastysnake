@@ -13,7 +13,6 @@ import java.util.ArrayList;
 
 /**
  * Manage database CRUD operation. Implemented as a singleton.
- * Author: QX
  */
 public class DBHelper extends SQLiteOpenHelper {
     private static final String TAG = "DBHelper";

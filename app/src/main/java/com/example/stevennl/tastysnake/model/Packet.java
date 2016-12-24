@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 /**
  * A custom data packet for bluetooth data transfer.
- * Author: LCY
  */
 public class Packet implements Serializable {
     private static final String TAG = "Packet";

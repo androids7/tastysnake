@@ -23,8 +23,6 @@ import java.util.Set;
 /**
  * A class to control bluetooth discovery, connection and data transfer.
  * Implemented as a singleton.
- * Reference: https://developer.android.com/guide/topics/connectivity/bluetooth.html
- * Author: LCY
  */
 public class BluetoothManager {
     private static final String TAG = "BluetoothManager";

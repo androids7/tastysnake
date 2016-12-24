@@ -13,7 +13,6 @@ import com.example.stevennl.tastysnake.model.AnalysisData;
 
 /**
  * Service to upload data to remote server.
- * Author: QX
  */
 public class UploadService extends IntentService {
     private static final String TAG = "UploadService";

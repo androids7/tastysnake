@@ -2,9 +2,11 @@
 
 A snake battle game on Android. 
 
-The move direction of the snake is controlled by gravity sensor and the two devices communicate with each other through bluetooth.
+The moving direction of the snake is controlled by gravity sensor and the two devices communicate with each other through bluetooth.
 
 ## Demo
+
+**Hint:** The red one is your snake while the blue one is your opponent's snake.
 
 ![](./doc/img/demo_light.gif)
 
@@ -13,12 +15,6 @@ The move direction of the snake is controlled by gravity sensor and the two devi
 ## Documentation
 
 * [Module](./doc/module.md)
-
-* [Database](./doc/database.md)
-
-* [Data Analysis](./doc/data_analysis.md)
-
-* [Custom Packet](./doc/packet.md)
 
 ## Release
 

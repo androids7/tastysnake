@@ -22,7 +22,6 @@ import com.example.stevennl.tastysnake.widget.SnakeImage;
 
 /**
  * Home page.
- * Author: LCY
  */
 public class HomeFragment extends Fragment {
     private static final String TAG = "HomeFragment";

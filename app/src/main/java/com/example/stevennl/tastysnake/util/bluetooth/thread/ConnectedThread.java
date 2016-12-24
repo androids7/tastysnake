@@ -14,7 +14,6 @@ import java.io.OutputStream;
 
 /**
  * Thread to control a connected socket to implement data transfer.
- * Author: LCY
  */
 public class ConnectedThread extends Thread {
     private static final String TAG = "ConnectedThread";

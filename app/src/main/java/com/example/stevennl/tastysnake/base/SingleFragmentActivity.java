@@ -11,7 +11,6 @@ import com.example.stevennl.tastysnake.R;
 
 /**
  * Activity having only one fragment.
- * Author: LCY
  */
 public abstract class SingleFragmentActivity extends BaseActivity {
 

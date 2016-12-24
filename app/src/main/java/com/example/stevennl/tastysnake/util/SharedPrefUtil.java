@@ -7,7 +7,6 @@ import com.example.stevennl.tastysnake.Config;
 
 /**
  * Manage operations for {@link SharedPreferences}.
- * Author: LCY
  */
 public class SharedPrefUtil {
     private static final String TAG = "SharedPrefUtil";

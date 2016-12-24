@@ -2,7 +2,6 @@ package com.example.stevennl.tastysnake.util.bluetooth.listener;
 
 /**
  * Listener for data transfer.
- * Author: LCY
  */
 public interface OnDataReceiveListener {
 

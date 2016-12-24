@@ -10,7 +10,6 @@ import java.util.Date;
 
 /**
  * Record of one battle.
- * Author: QX
  */
 public class BattleRecord {
     private Date timestamp;

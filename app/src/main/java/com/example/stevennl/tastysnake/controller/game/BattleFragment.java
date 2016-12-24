@@ -38,7 +38,6 @@ import java.util.TimerTask;
 
 /**
  * Game battle page.
- * Author: LCY
  */
 public class BattleFragment extends Fragment {
     private static final String TAG = "BattleFragment";

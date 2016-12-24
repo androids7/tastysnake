@@ -39,7 +39,6 @@ import static android.app.Activity.RESULT_OK;
 
 /**
  * Device connection page.
- * Author: LCY
  */
 public class ConnectFragment extends Fragment {
     private static final String TAG = "ConnectFragment";

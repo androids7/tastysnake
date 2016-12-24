@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 /**
  * Coordinate(position) in 2D plane.
- * Author: WTY
  */
 public class Pos implements Cloneable, Serializable {
     private int x;

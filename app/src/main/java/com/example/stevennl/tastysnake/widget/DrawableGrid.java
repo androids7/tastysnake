@@ -18,7 +18,6 @@ import com.example.stevennl.tastysnake.model.Point;
 
 /**
  * This view can divide the screen to several grids and draw the content of each grid.
- * Author: LCY
  */
 public class DrawableGrid extends SurfaceView implements SurfaceHolder.Callback {
     private static final String TAG = "DrawableGrid";

@@ -24,7 +24,6 @@ import java.util.Map;
 
 /**
  * Manage HTTP request. Implemented as a singleton.
- * Author: LCY
  */
 public class NetworkUtil {
     private static final String TAG = "NetworkUtil";

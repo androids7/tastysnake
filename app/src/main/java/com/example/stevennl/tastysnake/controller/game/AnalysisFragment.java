@@ -20,7 +20,6 @@ import com.example.stevennl.tastysnake.util.network.NetworkUtil;
 
 /**
  * Data analysis page.
- * Author: LCY
  */
 public class AnalysisFragment extends Fragment {
     private static final String TAG = "AnalysisFragment";

@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 /**
  * Game snake.
- * Author: WTY
  */
 public class Snake {
     private ArrayList<Pos> bodies = new ArrayList<>();

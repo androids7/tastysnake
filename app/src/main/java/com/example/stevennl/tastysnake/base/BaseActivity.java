@@ -11,7 +11,6 @@ import com.example.stevennl.tastysnake.R;
 
 /**
  * Activity that will load custom theme when starting.
- * Author: LCY
  */
 public abstract class BaseActivity extends AppCompatActivity {
     private static final String TAG = "BaseActivity";

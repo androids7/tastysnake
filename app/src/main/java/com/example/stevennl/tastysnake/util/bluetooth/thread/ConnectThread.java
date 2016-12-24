@@ -14,7 +14,6 @@ import java.util.UUID;
 
 /**
  * Bluetooth client thread.
- * Author: LCY
  */
 public class ConnectThread extends Thread {
     private static final String TAG = "ConnectThread";

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 /**
  * Data analysis parameters.
- * Author: QX
  */
 public class AnalysisData {
     private static final String TAG = "AnalysisData";

@@ -4,7 +4,6 @@ import com.example.stevennl.tastysnake.Config;
 
 /**
  * Point on the game map.
- * Author: LCY
  */
 public class Point {
     private int color;

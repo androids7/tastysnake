@@ -17,7 +17,6 @@ import java.lang.ref.WeakReference;
 
 /**
  * Thread to send data during the game.
- * Author: LCY
  */
 public class SendThread extends HandlerThread {
     private static final String TAG = "SendThread";
