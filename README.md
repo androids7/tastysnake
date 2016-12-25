@@ -1,8 +1,8 @@
 # TastySnake
 
-A snake battle game on Android. 
+This is a snake battle game on Android. The snake is controlled using the device's accelerometer sensor and the connection is based on bluetooth.
 
-The moving direction of the snake is controlled by gravity sensor and the two devices communicate with each other through bluetooth.
+[技术实现](./doc/implementation.md)
 
 ## Demo
 
@@ -11,10 +11,6 @@ The moving direction of the snake is controlled by gravity sensor and the two de
 ![](./doc/img/demo_light.gif)
 
 ![](./doc/img/demo_dark.gif)
-
-## Documentation
-
-* [Module](./doc/module.md)
 
 ## Release
 

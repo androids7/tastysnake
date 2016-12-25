@@ -1,6 +1,6 @@
 # Data Analysis
 
-Use [database](./database.md) data to analyze user's behaviour.
+Use data in [database](./database.md) to analyze user's behaviour.
 
 Author: [@xuanqu](https://github.com/xuanqu) [@stevennL](https://github.com/stevennL)
 
@@ -52,7 +52,7 @@ Use [formula_test.m](./program/formula_test.m)(MATLAB) to test W and P.
 
 ## Remote
 
-Data analysis making use of server's database.
+Data analysis using data from remote server.
 
 ### Description
 
@@ -64,16 +64,15 @@ Data analysis making use of server's database.
 
 ### Definition
 
-Get average W value from server, then:
-
-```c++
+```java
+avg = getAvgWValueFromServer();
 if (W > avg) {
-    显示 Description#1;
+    showDescription1();
     U = 100 * (W - avg) / avg;
 } else if (W == avg) {
-    显示 Description#2;
+    showDescription2();
 } else if (W < avg) {
-    显示 Description#3;
+    showDescription3();
     U = 100 * (avg - W) / avg;
 }
 ```
