@@ -2,6 +2,10 @@
 
 #### Directory
 
+* [Package Structure(包目录结构)](#package-structure)
+
+* [Game UI(游戏界面)](#game-ui)
+
 * [Game Elements(游戏元素)](#game-elements)
 
 * [Plot(地图绘制)](#plot)
@@ -15,6 +19,151 @@
 * [Data Analysis(数据分析)](#data-analysis)
 
 * [Server(服务器)](#server)
+
+## Package Structure
+
+```
+com.example.stevennl.tastysnake
+    base        // 存放一些基类与通用接口
+    controller  // 存放Activity
+        game    // 存放游戏界面Activity
+        test    // 存放测试界面Activity
+    model       // 存放游戏元素类与游戏数据类
+    util        // 存放通用工具类
+    widget      // 存放自定义控件
+```
+
+## Game UI
+
+游戏界面使用Activity + Fragment的方式编写，仅有一个Activity，即[GameActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/GameActivity.java)。四个游戏界面对应四个Fragment，组成如下：
+
+| Source | Screenshot | Description |
+|:------:|:----------:|-------------|
+|[HomeFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/HomeFragment.java)|![](./img/frag_home.png)|游戏主界面。点击红色的蛇进入数据分析界面，点击蓝色的蛇进行深色/浅色主题切换。|
+|[ConnectFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/ConnectFragment.java)|![](./img/frag_conn.png)|设备连接界面。下拉刷新将重新扫描设备，点击列表中的设备即可与该设备进行连接。|
+|[BattleFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/BattleFragment.java)|![](./img/frag_battle.png)|游戏对战界面。|
+|[AnalysisFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/AnalysisFragment.java)|![](./img/frag_analysis.png)|数据分析界面。|
+
+### 两侧蛇的动画
+
+注意到在游戏主界面和设备连接界面的两侧有一条红色和蓝色的蛇，在界面切换时将会产生如下动画：
+
+![](./img/snake_image.gif)
+
+我们将这两条蛇封装在了同一个自定义控件[SnakeImage.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/SnakeImage.java)中。蛇会定时的眨眼睛，我们使用帧动画实现，红色蛇的帧动画文件如下：
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    <item android:drawable="@mipmap/snake_my" android:duration="1500" />
+    <item android:drawable="@mipmap/snake_my_close" android:duration="150" />
+    <item android:drawable="@mipmap/snake_my" android:duration="150" />
+    <item android:drawable="@mipmap/snake_my_close" android:duration="150" />
+    <item android:drawable="@mipmap/snake_my" android:duration="1000" />
+    <item android:drawable="@mipmap/snake_my_close" android:duration="150" />
+</animation-list>
+```
+
+蓝色蛇的帧动画文件内容类似。实现帧动画的思路很简单，我们准备一张睁眼和一张闭眼的蛇的图片，每隔一定时间交替显示这两张图片即可制造出眨眼睛的效果。上述xml文件就完成的图片交替的过程，`@mipmap/snake_my`引用睁眼的图片文件，`@mipmap/snake_my_close`引用闭眼的图片文件，`android:duration="150"`指明了当前图片显示的时间，最后只要将这个文件放进drawable目录下，将其设置成该控件的background即可。
+
+除此之外，SnakeImage控件中提供了播放蛇进入和退出动画的方法，动画使用`ObjectAnimator`类实现：
+
+```java
+/**
+ * Show snake enter animation.
+ *
+ * @param endListener An {@link AnimationEndListener}
+ */
+public void startEnter(@Nullable final AnimationEndListener endListener) {
+    float dist = offsetMarginPixel;
+    switch (direc) {
+        case UP:
+            anim = ObjectAnimator.ofFloat(this, ATTR_TRANSY, 0, -dist)
+                    .setDuration(Config.DURATION_SNAKE_ANIM);
+            break;
+        case DOWN:
+            anim = ObjectAnimator.ofFloat(this, ATTR_TRANSY, 0, dist)
+                    .setDuration(Config.DURATION_SNAKE_ANIM);
+            break;
+        default:
+            break;
+    }
+    anim.addListener(new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+            // Do nothing
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (endListener != null) {
+                endListener.onAnimationEnd(animation);
+            }
+            anim = null;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            // Do nothing
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+            // Do nothing
+        }
+    });
+    anim.start();
+}
+
+/**
+ * Show snake exit animation.
+ *
+ * @param endListener An {@link AnimationEndListener}
+ */
+public void startExit(@Nullable final AnimationEndListener endListener) {
+    float offset = getHeight() - offsetMarginPixel;
+    switch (direc) {
+        case UP:
+            anim = ObjectAnimator.ofFloat(this, ATTR_TRANSY, getTranslationY(), offset)
+                    .setDuration(Config.DURATION_SNAKE_ANIM);
+            break;
+        case DOWN:
+            anim = ObjectAnimator.ofFloat(this, ATTR_TRANSY, getTranslationY(), -offset)
+                    .setDuration(Config.DURATION_SNAKE_ANIM);
+            break;
+        default:
+            break;
+    }
+    anim.addListener(new Animator.AnimatorListener() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+            // Do nothing
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            if (endListener != null) {
+                endListener.onAnimationEnd(animation);
+            }
+            anim = null;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            // Do nothing
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+            // Do nothing
+        }
+    });
+    anim.start();
+}
+```
+
+这两个方法都传入了一个`AnimationEndListener`接口，它将在动画播放结束时被调用。在界面刚打开时，动画结束之后才会执行该界面的逻辑，在退出界面时，动画结束之后才会真正切换到下一个界面，这就是这个回调接口的作用。
 
 ## Game Elements
 
@@ -30,7 +179,7 @@
 
 ## Plot
 
-Source: [DrawableGrid.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/DrawableGrid.java)
+Source: [DrawableGrid.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/DrawableGrid.java) [DrawableGridTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/DrawableGridTestActivity.java)
 
 整张地图的绘制方法封装在了DrawableGrid这个自定义控件中，在游戏界面的布局中我们只需要简单的添加这个控件即可在屏幕上显示一张地图：
 
@@ -191,23 +340,202 @@ private void drawMapContent(Canvas canvas) {
 
 ## Bluetooth
 
-Source: [BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/BluetoothManager.java)
+Source: [BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/BluetoothManager.java) [Packet.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Packet.java)
+ [BluetoothTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/BluetoothTestActivity.java) [PacketTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/PacketTestActivity.java)
 
-Reference: [Android Developer-bluetooth](https://developer.android.com/guide/topics/connectivity/bluetooth.html)
+蓝牙通信根据官方的[蓝牙通信文档](https://developer.android.com/guide/topics/connectivity/bluetooth.html)编写，基于Andorid的BluetoothAdapter实现。我们将与蓝牙通信相关的API封装在了BluetoothManager类中，蓝牙的打开与设备发现过程官方文档已经有详细说明，这里不再展开叙述。蓝牙通信比较关键的地方在于三条线程的协调，首先是服务端的接收线程[AcceptThread.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/AcceptThread.java)，这条线程的`run()`方法如下：
 
-* Based on android.bluetooth.BluetoothAdapter
+```java
+/**
+ * Keep listening until exception occurs or a socket is returned
+ */
+@Override
+public void run() {
+    if (serverSocket == null) {
+        return;
+    }
+    BluetoothSocket socket = null;
+    Log.d(TAG, "Bluetooth server is listening...");
+    while (true) {
+        try {
+            // accept()方法是阻塞的，当有客户端连接成功或者产生异常时此方法终止
+            socket = serverSocket.accept();
+        } catch (IOException e) {
+            Log.e(TAG, "Error:", e);
+            errorListener.onError(OnErrorListener.ERR_SERVER_SOCKET_ACCEPT, e);
+            break;
+        }
+        try {
+            if (socket != null) {
+                onSocketEstablishedListener.onSocketEstablished(socket, stateListener, errorListener);
+                serverSocket.close();
+                break;
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error:", e);
+            errorListener.onError(OnErrorListener.ERR_SOCKET_CLOSE, e);
+            break;
+        }
+    }
+    Log.d(TAG, "Thread ended.");
+}
+```
 
-* Server: [AcceptThread](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/AcceptThread.java)
+另一条是客户端的连接线程[ConnectThread.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/ConnectThread.java)，这条线程的`run()`方法如下：
 
-* Client: [ConnectThread](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/ConnectThread.java)
+```java
+/**
+ * Connect the device and get the socket.
+ */
+@Override
+public void run() {
+    if (socket == null) {
+        return;
+    }
+    try {
+        Log.d(TAG, "Connecting remote device...");
+        // 连接服务器socket，这个方法也是阻塞的，直到连接成功或者抛出异常才停止
+        socket.connect();
+    } catch (IOException connectException) {
+        Log.e(TAG, "Error:", connectException);
+        errorListener.onError(OnErrorListener.ERR_CLIENT_SOCKET_CONNECT, connectException);
+        try {
+            socket.close();
+        } catch (IOException closeException) {
+            Log.e(TAG, "Error:", closeException);
+            errorListener.onError(OnErrorListener.ERR_SOCKET_CLOSE, closeException);
+        }
+        return;
+    }
+    onSocketEstablishedListener.onSocketEstablished(socket, stateListener, errorListener);
+    Log.d(TAG, "Thread ended.");
+}
+```
 
-* Data Channel: [ConnectedThread](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/ConnectedThread.java)
+客户端、服务端连接成功后，上述两条线程都会调用`onSocketEstablishedListener.onSocketEstablished()`方法，该接口的声明如下：
 
-* [Custom Packet](./custom_packet.md)
+```java
+/**
+ * Listener for socket establishment of device connection.
+ */
+public interface OnSocketEstablishedListener {
+
+    /**
+     * Called when a connection socket is established.
+     *
+     * @param socket The connection socket
+     * @param stateListener A {@link OnStateChangedListener}
+     * @param errorListener A {@link OnErrorListener}
+     */
+    void onSocketEstablished(BluetoothSocket socket,
+                             OnStateChangedListener stateListener,
+                             OnErrorListener errorListener);
+}
+```
+
+这个接口将在BluetoothManager的如下两个方法中传给两个线程：
+
+```java
+/**
+ * Run a bluetooth server thread to listen to the connection request.
+ */
+public void runServerAsync(OnStateChangedListener stateListener_,
+                           OnErrorListener errorListener_) {
+    if (!isServerRunning()) {
+        acceptThread = new AcceptThread(bluetoothAdapter, new OnSocketEstablishedListener() {
+            @Override
+            public void onSocketEstablished(BluetoothSocket socket,
+                                            OnStateChangedListener stateListener,
+                                            OnErrorListener errorListener) {
+                stateListener.onServerSocketEstablished();
+                manageConnectedSocket(socket, stateListener, errorListener);
+            }
+        }, stateListener_, errorListener_);
+        acceptThread.start();
+        Log.d(TAG, "Server running...");
+    }
+}
+
+/**
+ * Connect a bluetooth server.
+ *
+ * @param device The device to connect
+ */
+public void connectDeviceAsync(BluetoothDevice device,
+                               OnStateChangedListener stateListener_,
+                               OnErrorListener errorListener_) {
+    cancelDiscovery();  // Discovery process will slow down the connection
+    if (!isClientConnecting()) {
+        connectThread = new ConnectThread(device, new OnSocketEstablishedListener() {
+            @Override
+            public void onSocketEstablished(BluetoothSocket socket,
+                                            OnStateChangedListener stateListener,
+                                            OnErrorListener errorListener) {
+                stateListener.onClientSocketEstablished();
+                manageConnectedSocket(socket, stateListener, errorListener);
+            }
+        }, stateListener_, errorListener_);
+        connectThread.start();
+        Log.d(TAG, "Connecting...");
+    }
+}
+```
+
+两个方法的方法名是自解释的，一个用于启动服务器线程，另一个用于启动客户端线程，传入的`OnSocketEstablishedListener`接口中调用了`manageConnectedSocket()`方法。这个方法利用连接成功后的socket建立数据通道，即打开数据通信线程[ConnectedThread.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/ConnectedThread.java)，这个线程的`run()`方法中不断从输入流读取数据，即不断读取远程设备发过来的数据：
+
+```java
+/**
+ * Keep listening to the InputStream until an exception occurs.
+ */
+@Override
+public void run() {
+    if (inStream == null || outStream == null) {
+        return;
+    }
+    byte[] buffer = new byte[Packet.SIZE];
+    stateListener.onDataChannelEstablished();
+    Log.d(TAG, "Open input stream...");
+    while (true) {
+        try {
+            // 如果输入流没有数据，read()方法是阻塞的，直到输入流有数据，此方法才会返回
+            int bytesCnt = inStream.read(buffer);
+            if (dataListener != null) {
+                dataListener.onReceive(bytesCnt, buffer);
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Error:", e);
+            errorListener.onError(OnErrorListener.ERR_STREAM_READ, e);
+            break;
+        }
+    }
+    Log.d(TAG, "Thread ended.");
+}
+```
+
+另外，此线程暴露一个public方法供外部向输出流写入数据，即不断向远程设备发送数据：
+
+```java
+/**
+ * Write data to remote device.
+ *
+ * @param data The data to be sent
+ */
+public void write(byte[] data) {
+    try {
+        Log.d(TAG, "Data of size " + data.length + " will be sent.");
+        outStream.write(data);
+    } catch (IOException e) {
+        Log.e(TAG, "Error:", e);
+        errorListener.onError(OnErrorListener.ERR_STREAM_WRITE, e);
+    }
+}
+```
+
+由于在底层传输的数据都是byte[]，也就是字节流形式。为了使传输数据更为方便，数据更加结构化，我们封装了一个[自定义数据包](./custom_packet.md)，此数据包可以转换为byte[]，也可以利用byte[]进行构造。
 
 ## Sensor
 
-Source: [SensorController.java](../app/src/main/java/com/example/stevennl/tastysnake/util/sensor/SensorController.java)
+Source: [SensorController.java](../app/src/main/java/com/example/stevennl/tastysnake/util/sensor/SensorController.java) [SensorTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/SensorTestActivity.java)
 
 使用安卓设备提供的加速度传感器，获取x/y两个方向的加速度。为了获取初始数据确定x/y的使用，在测试中发现如下极端数据：（横屏）
 
@@ -238,7 +566,7 @@ Source: [SensorController.java](../app/src/main/java/com/example/stevennl/tastys
 
 ## Network
 
-Source: [NetworkUtil.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/NetworkUtil.java)
+Source: [NetworkUtil.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/NetworkUtil.java) [NetworkTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/NetworkTestActivity.java)
 
 应用中的网络请求模块使用了Google提供的轻量级网络访问框架[volley](https://android.googlesource.com/platform/frameworks/volley/+/4ad53e3321d9bed5a216d65623d92c91c5457e55)，此框架提供了一个请求队列(RequestQueue)，可以将网络请求添加至此队列，交给volley去发送。
 
@@ -385,13 +713,15 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 
 ## Data Analysis
 
+Source: [DBTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/DBTestActivity.java)
+
 Docs: [Database](./database.md) [Data Analysis](./data_analysis.md)
 
 * Analyze using data in local database
 
 * Analyze using data from remote server
 
-* Upload local data to remote through [UploadService](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)
+* Upload local data to remote through [UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)
 
 ## Server
 
