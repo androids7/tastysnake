@@ -16,38 +16,42 @@ public class Pos implements Cloneable, Serializable {
         this.y = y;
     }
 
-    public Pos to(Direction k) {
+    /**
+     * Return the position at a given direction(relative to self).
+     */
+    public Pos getPosAt(Direction k) {
         return new Pos(x + dx[k.ordinal()], y + dy[k.ordinal()]);
     }
 
-    public Direction dirTo(Pos a) {
+    /**
+     * Return the direction of current position relative to a given position.
+     *
+     * @param p The given position
+     */
+    public Direction getDirectionRelativeTo(Pos p) {
         for (int i = 0; i < 4; i ++) {
-            if (a.to(Direction.values()[i]).equals(this))
-                return Direction.values()[i];
+            Direction d = Direction.values()[i];
+            if (p.getPosAt(d).equals(this))
+                return d;
         }
         return Direction.NONE;
-    }
-
-    @Override
-    public Pos clone() {
-        return new Pos(x, y);
     }
 
     public boolean equals(Pos a) {
         return x == a.getX() && y == a.getY();
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-    public void setY(int y) {
-        this.y = y;
-    }
     public int getX() {
         return x;
     }
+
     public int getY() {
         return y;
+    }
+
+    @Override
+    public Pos clone() {
+        return new Pos(x, y);
     }
 
     @Override

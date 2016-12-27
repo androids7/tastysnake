@@ -12,10 +12,8 @@ public class Snake {
     private ArrayList<Point.Type> types = new ArrayList<>();
     private Direction direc;
     private Map map;
-    private Type type;
-    private int row;
-    private int col;
     private int color;
+    private Type type;
 
     /**
      * Type of the snake.
@@ -78,8 +76,6 @@ public class Snake {
         this.map = map;
         this.type = type;
         this.color = color;
-        this.row = map.getRowCount();
-        this.col = map.getColCount();
         genType();
         for (int i = 0; i < bodies.size(); i ++) {
             map.setPoint(bodies.get(i), new Point(color, this.types.get(i)));
@@ -92,9 +88,9 @@ public class Snake {
     public MoveResult move(Direction order) {
         Pos head = bodies.get(0);
         if (order == Direction.NONE || order.ordinal() == (direc.ordinal() + 2) % 4) {
-            bodies.add(0, head.to(direc));
+            bodies.add(0, head.getPosAt(direc));
         } else {
-            bodies.add(0, head.to(order));
+            bodies.add(0, head.getPosAt(order));
             direc = order;
         }
         MoveResult moveResult = calMoveResult();
@@ -125,13 +121,17 @@ public class Snake {
      */
     private MoveResult calMoveResult() {
         Pos head = bodies.get(0);
-        if (head.getX() >= row || head.getX() < 0 || head.getY() >= col || head.getY() < 0) return MoveResult.OUT;
+        if (head.getX() >= map.getRowCount() || head.getX() < 0
+                || head.getY() >= map.getColCount() || head.getY() < 0)
+            return MoveResult.OUT;
         for (int i = 0; i < bodies.size(); i ++)
             for (int j = i + 1; j < bodies.size(); j ++)
-                if (bodies.get(i).getX() == bodies.get(j).getX() && bodies.get(i).getY() == bodies.get(j).getY())
+                if (bodies.get(i).getX() == bodies.get(j).getX()
+                        && bodies.get(i).getY() == bodies.get(j).getY())
                     return MoveResult.SUICIDE;
         int headColor = map.getPoint(head).getColor();
-        if ((headColor == Config.COLOR_SNAKE_ENEMY || headColor == Config.COLOR_SNAKE_MY) && headColor != color)
+        if ((headColor == Config.COLOR_SNAKE_ENEMY
+                || headColor == Config.COLOR_SNAKE_MY) && headColor != color)
             return MoveResult.HIT_ENEMY;
         return MoveResult.SUC;
     }
@@ -159,31 +159,43 @@ public class Snake {
             Pos pre = bodies.get(i - 1);
             Pos succ = bodies.get(i + 1);
             Pos now = bodies.get(i);
-            if (pre.dirTo(now) == Direction.LEFT && now.dirTo(succ) == Direction.LEFT)
+            if (pre.getDirectionRelativeTo(now) == Direction.LEFT
+                    && now.getDirectionRelativeTo(succ) == Direction.LEFT)
                 types.add(Point.Type.BODY_HOR);
-            if (pre.dirTo(now) == Direction.RIGHT && now.dirTo(succ) == Direction.RIGHT)
+            if (pre.getDirectionRelativeTo(now) == Direction.RIGHT
+                    && now.getDirectionRelativeTo(succ) == Direction.RIGHT)
                 types.add(Point.Type.BODY_HOR);
-            if (pre.dirTo(now) == Direction.UP && now.dirTo(succ) == Direction.UP)
+            if (pre.getDirectionRelativeTo(now) == Direction.UP
+                    && now.getDirectionRelativeTo(succ) == Direction.UP)
                 types.add(Point.Type.BODY_VER);
-            if (pre.dirTo(now) == Direction.DOWN && now.dirTo(succ) == Direction.DOWN)
+            if (pre.getDirectionRelativeTo(now) == Direction.DOWN
+                    && now.getDirectionRelativeTo(succ) == Direction.DOWN)
                 types.add(Point.Type.BODY_VER);
-            if ((pre.dirTo(now) == Direction.UP && succ.dirTo(now) == Direction.LEFT)
-                    || (pre.dirTo(now) == Direction.LEFT && succ.dirTo(now) == Direction.UP))
+            if ((pre.getDirectionRelativeTo(now) == Direction.UP
+                    && succ.getDirectionRelativeTo(now) == Direction.LEFT)
+                    || (pre.getDirectionRelativeTo(now) == Direction.LEFT
+                    && succ.getDirectionRelativeTo(now) == Direction.UP))
                 types.add(Point.Type.BODY_L_U);
-            if ((pre.dirTo(now) == Direction.DOWN && succ.dirTo(now) == Direction.LEFT)
-                    || (pre.dirTo(now) == Direction.LEFT && succ.dirTo(now) == Direction.DOWN))
+            if ((pre.getDirectionRelativeTo(now) == Direction.DOWN
+                    && succ.getDirectionRelativeTo(now) == Direction.LEFT)
+                    || (pre.getDirectionRelativeTo(now) == Direction.LEFT
+                    && succ.getDirectionRelativeTo(now) == Direction.DOWN))
                 types.add(Point.Type.BODY_L_D);
-            if ((pre.dirTo(now) == Direction.UP && succ.dirTo(now) == Direction.RIGHT)
-                    || (pre.dirTo(now) == Direction.RIGHT && succ.dirTo(now) == Direction.UP))
+            if ((pre.getDirectionRelativeTo(now) == Direction.UP
+                    && succ.getDirectionRelativeTo(now) == Direction.RIGHT)
+                    || (pre.getDirectionRelativeTo(now) == Direction.RIGHT
+                    && succ.getDirectionRelativeTo(now) == Direction.UP))
                 types.add(Point.Type.BODY_R_U);
-            if ((pre.dirTo(now) == Direction.DOWN && succ.dirTo(now) == Direction.RIGHT)
-                    || (pre.dirTo(now) == Direction.RIGHT && succ.dirTo(now) == Direction.DOWN))
+            if ((pre.getDirectionRelativeTo(now) == Direction.DOWN
+                    && succ.getDirectionRelativeTo(now) == Direction.RIGHT)
+                    || (pre.getDirectionRelativeTo(now) == Direction.RIGHT
+                    && succ.getDirectionRelativeTo(now) == Direction.DOWN))
                 types.add(Point.Type.BODY_R_D);
         }
         if (bodies.size() >= 2) {
             Pos last = bodies.get(bodies.size() - 1);
             Pos butLast = bodies.get(bodies.size() - 2);
-            if (last.dirTo(butLast).ordinal() % 2 == 1)
+            if (last.getDirectionRelativeTo(butLast).ordinal() % 2 == 1)
                 types.add(Point.Type.BODY_HOR);
             else
                 types.add(Point.Type.BODY_VER);

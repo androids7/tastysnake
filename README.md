@@ -1,12 +1,24 @@
 # TastySnake
 
-This is a snake battle game on Android. The snake is controlled using the device's accelerometer sensor and the connection is based on bluetooth.
+A snake battle game on Android.
 
-[技术实现](./doc/implementation.md)
+* [技术实现](./doc/implementation.md)
+
+## Game Rules
+
+1. 请记住自己永远是红色的蛇。
+
+2. 留意上方倒计时！每隔 10 秒攻守身份会对调。
+
+3. 只要两条蛇互相碰撞，攻击者胜利。
+
+4. 撞到自己的身体或者战场边界将会被判定为失败。
+
+5. 吃到战场上的食物，会导致身体变长。
+
+6. 蛇的移动方向使用重力感应控制。
 
 ## Demo
-
-**Hint:** The red one is your snake while the blue one is your opponent's snake.
 
 ![](./doc/img/demo_light.gif)
 

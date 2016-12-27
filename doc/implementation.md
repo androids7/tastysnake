@@ -6,7 +6,19 @@
 
 * [Game UI(游戏界面)](#game-ui)
 
+    * [SnakeImage(两侧蛇的动画)](#snakeimage)
+
+    * [HelpDialog(游戏规则Dialog)](#helpdialog)
+
 * [Game Elements(游戏元素)](#game-elements)
+
+    * [Pos(坐标二元组)](#pos)
+
+    * [Point(地图上的点)](#point)
+
+    * [Map(地图)](#map)
+
+    * [Snake(蛇)](#snake)
 
 * [Plot(地图绘制)](#plot)
 
@@ -44,7 +56,7 @@ com.example.stevennl.tastysnake
 |[BattleFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/BattleFragment.java)|![](./img/frag_battle.png)|游戏对战界面。|
 |[AnalysisFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/AnalysisFragment.java)|![](./img/frag_analysis.png)|数据分析界面。|
 
-### 两侧蛇的动画
+### SnakeImage
 
 注意到在游戏主界面和设备连接界面的两侧有一条红色和蓝色的蛇，在界面切换时将会产生如下动画：
 
@@ -77,7 +89,7 @@ com.example.stevennl.tastysnake
  */
 public void startEnter(@Nullable final AnimationEndListener endListener) {
     float dist = offsetMarginPixel;
-    switch (direc) {
+    switch (direc) {  // 区分向上出现和向下出现的蛇
         case UP:
             anim = ObjectAnimator.ofFloat(this, ATTR_TRANSY, 0, -dist)
                     .setDuration(Config.DURATION_SNAKE_ANIM);
@@ -123,7 +135,7 @@ public void startEnter(@Nullable final AnimationEndListener endListener) {
  */
 public void startExit(@Nullable final AnimationEndListener endListener) {
     float offset = getHeight() - offsetMarginPixel;
-    switch (direc) {
+    switch (direc) {  // 区分向上出现和向下出现的蛇
         case UP:
             anim = ObjectAnimator.ofFloat(this, ATTR_TRANSY, getTranslationY(), offset)
                     .setDuration(Config.DURATION_SNAKE_ANIM);
@@ -165,23 +177,222 @@ public void startExit(@Nullable final AnimationEndListener endListener) {
 
 这两个方法都传入了一个`AnimationEndListener`接口，它将在动画播放结束时被调用。在界面刚打开时，动画结束之后才会执行该界面的逻辑，在退出界面时，动画结束之后才会真正切换到下一个界面，这就是这个回调接口的作用。
 
+### HelpDialog
+
+设备连接成功、游戏开始之前会显示如下的Dialog显示游戏规则：
+
+![](./img/dialog_help.png)
+
+这个Dialog封装在了一个自定义控件[HelpDialog.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/HelpDialog.java)中，只需要调用`HelpDialog.show()`即可显示此Dialog。另外，此Dialog的构造函数中需要传入一个`DialogInterface.OnCancelListener`接口，它将在Dialog被关闭之后调用。
+
 ## Game Elements
 
-* [Direction](../app/src/main/java/com/example/stevennl/tastysnake/model/Direction.java)
+在进行游戏元素的搭建此之前，我们先定义一个[Direction.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Direction.java)枚举类表示游戏中的方向，移动方向只有上下左右四个，另外添加一个方向NONE，表示无移动方向：
 
-* [Pos](../app/src/main/java/com/example/stevennl/tastysnake/model/Pos.java)
+```java
+public enum Direction {
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT,
+    NONE
+}
+```
 
-* [Point](../app/src/main/java/com/example/stevennl/tastysnake/model/Point.java)
+游戏元素的搭建主要由Pos、Point、Map、Snake这四个类完成，下面分别进行讲述。
 
-* [Map](../app/src/main/java/com/example/stevennl/tastysnake/model/Map.java)
+### Pos
 
-* [Snake](../app/src/main/java/com/example/stevennl/tastysnake/model/Snake.java)
+[Pos.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Pos.java)是一个二维平面的坐标二元组，里面只有两个属性：x和y，表示平面上的横坐标与纵坐标。在我们的地图上，横坐标对应行号，纵坐标对应列号。这个类提供两个主要方法：
+
+```java
+/**
+ * Return the position at a given direction(relative to self).
+ */
+public Pos getPosAt(Direction k) {
+    return new Pos(x + dx[k.ordinal()], y + dy[k.ordinal()]);
+}
+
+/**
+ * Return the direction of current position relative to a given position.
+ *
+ * @param p The given position
+ */
+public Direction getDirectionRelativeTo(Pos p) {
+    for (int i = 0; i < 4; i ++) {
+        Direction d = Direction.values()[i];
+        if (p.getPosAt(d).equals(this))
+            return d;
+    }
+    return Direction.NONE;
+}
+```
+
+`getPosAt(Direction k)`用于获取邻接位置的坐标，`getDirectionRelativeTo(Pos p)`用于获取当前位置相对于邻接位置的方向。
+
+### Point
+
+[Point.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Point.java)是地图上任意一个点，在每个点我们储存该点的类型和颜色值：
+
+```java
+/**
+ * Point on the game map.
+ */
+public class Point {
+    private int color;
+    private Type type;
+
+    // 点的类型共13种
+    public enum Type {
+        BLANK,
+        FOOD_LENGTHEN,
+        FOOD_SHORTEN,
+        HEAD_L,
+        HEAD_U,
+        HEAD_R,
+        HEAD_D,
+        BODY_HOR,
+        BODY_VER,
+        BODY_L_U,
+        BODY_L_D,
+        BODY_R_U,
+        BODY_R_D
+    }
+}
+```
+
+注意到Type中4个HEAD开头的值表示了朝向四个方向的蛇头，BODY_HOR和BODY_VER分别表示水平和垂直的身体，最后的4个BODY开头的值表示拐弯部分的蛇身。另外，FOOD_SHORTEN表示吃了能让蛇变短的食物，基于游戏策略的考虑，我们暂时没把这类食物加入游戏中。
+
+### Map
+
+[Map.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Map.java)是游戏地图，显然，这里面存放了一个Point二维数组：
+
+```java
+/**
+ * Game map.
+ */
+public class Map {
+    private Point[][] content;
+    private int row;
+    private int col;
+}
+```
+
+除此之外，该类提供了创建食物和读写地图内容的方法：
+
+```java
+/**
+ * Create food at a given position.
+ *
+ * @param x The row number of the food
+ * @param y The column number of the food
+ * @param lengthen True if the food will lengthen the snake who eats it, false shorten
+ */
+public void createFood(int x, int y, boolean lengthen) {
+    content[x][y].setColor(lengthen ? Config.COLOR_FOOD_LENGTHEN : Config.COLOR_FOOD_SHORTEN);
+    content[x][y].setType(lengthen ? Point.Type.FOOD_LENGTHEN : Point.Type.FOOD_SHORTEN);
+}
+
+/**
+ * Set a point on the map.
+ *
+ * @param p The position of the new point
+ * @param c The new point
+ */
+public void setPoint(Pos p, Point c) {
+    if (isValid(p.getX(), p.getY())) {
+        content[p.getX()][p.getY()] = c;
+    }
+}
+
+/**
+ * Return a point on the map.
+ *
+ * @param x The row number of the point
+ * @param y The column number of the point
+ */
+public Point getPoint(int x, int y) {
+    if (!isValid(x, y))  {
+        return new Point();
+    }
+    return content[x][y];
+}
+```
+
+这几个方法都是一目了然的，这里不做过多的介绍。
+
+### Snake
+
+[Snake.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Snake.java)是游戏中移动的蛇，该类有如下几个属性：
+
+```java
+/**
+ * Game snake.
+ */
+public class Snake {
+    // 蛇身的坐标集合
+    private ArrayList<Pos> bodies = new ArrayList<>();
+
+    // 蛇身的Point类型集合
+    private ArrayList<Point.Type> types = new ArrayList<>();
+
+    // 蛇的当前移动方向
+    private Direction direc;
+
+    // 蛇移动的地图
+    private Map map;
+
+    // 蛇身的颜色
+    private int color;
+
+    // 蛇的类型
+    private Type type;
+
+    /**
+     * Type of the snake.
+     * 用于区分蓝牙服务端的蛇和蓝牙客户端的蛇。
+     */
+    public enum Type {
+        SERVER,
+        CLIENT
+    }
+
+    /**
+     * Result after snake moves.
+     */
+    public enum MoveResult {
+        OUT,        // 移出战场边界
+        SUICIDE,    // 撞到自己
+        HIT_ENEMY,  // 撞到另一条蛇
+        SUC,        // 成功移动
+    }
+}
+```
+
+这个类的三个主要方法如下：
+
+```java
+/**
+ * 将蛇向order方向移动一步。
+ */
+public MoveResult move(Direction order);
+
+/**
+ * 计算蛇的移动结果。
+ */
+private MoveResult calMoveResult();
+
+/**
+ * 生成当前蛇身的Point类型集合。
+ */
+private void genType();
+```
+
+具体实现请参考源码。
 
 ## Plot
 
-Source: [DrawableGrid.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/DrawableGrid.java) [DrawableGridTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/DrawableGridTestActivity.java)
-
-整张地图的绘制方法封装在了DrawableGrid这个自定义控件中，在游戏界面的布局中我们只需要简单的添加这个控件即可在屏幕上显示一张地图：
+整张地图的绘制方法封装在了[DrawableGrid.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/DrawableGrid.java)这个自定义控件中，在游戏界面的布局中我们只需要简单的添加这个控件即可在屏幕上显示一张地图：
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -340,10 +551,7 @@ private void drawMapContent(Canvas canvas) {
 
 ## Bluetooth
 
-Source: [BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/BluetoothManager.java) [Packet.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Packet.java)
- [BluetoothTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/BluetoothTestActivity.java) [PacketTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/PacketTestActivity.java)
-
-蓝牙通信根据官方的[蓝牙通信文档](https://developer.android.com/guide/topics/connectivity/bluetooth.html)编写，基于Andorid的BluetoothAdapter实现。我们将与蓝牙通信相关的API封装在了BluetoothManager类中，蓝牙的打开与设备发现过程官方文档已经有详细说明，这里不再展开叙述。蓝牙通信比较关键的地方在于三条线程的协调，首先是服务端的接收线程[AcceptThread.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/AcceptThread.java)，这条线程的`run()`方法如下：
+蓝牙通信根据官方的[蓝牙通信文档](https://developer.android.com/guide/topics/connectivity/bluetooth.html)编写，基于Andorid的BluetoothAdapter实现。我们将与蓝牙通信相关的API封装在了[BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/BluetoothManager.java)这个工具类中，蓝牙的打开与设备发现过程官方文档已经有详细说明，这里不再展开叙述。蓝牙通信比较关键的地方在于三条线程的协调，首先是服务端的接收线程[AcceptThread.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/AcceptThread.java)，这条线程的`run()`方法如下：
 
 ```java
 /**
@@ -535,9 +743,7 @@ public void write(byte[] data) {
 
 ## Sensor
 
-Source: [SensorController.java](../app/src/main/java/com/example/stevennl/tastysnake/util/sensor/SensorController.java) [SensorTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/SensorTestActivity.java)
-
-使用安卓设备提供的加速度传感器，获取x/y两个方向的加速度。为了获取初始数据确定x/y的使用，在测试中发现如下极端数据：（横屏）
+游戏中的蛇的移动方向是使用重力感应控制的，我们将与传感器相关的API封装在了[SensorController.java](../app/src/main/java/com/example/stevennl/tastysnake/util/sensor/SensorController.java)这个工具类中，它使用安卓设备提供的加速度传感器，获取x/y两个方向的加速度。为了获取初始数据确定x/y的使用，在测试中发现如下极端数据：（横屏）
 
 ```java
 /**
@@ -566,9 +772,7 @@ Source: [SensorController.java](../app/src/main/java/com/example/stevennl/tastys
 
 ## Network
 
-Source: [NetworkUtil.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/NetworkUtil.java) [NetworkTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/NetworkTestActivity.java)
-
-应用中的网络请求模块使用了Google提供的轻量级网络访问框架[volley](https://android.googlesource.com/platform/frameworks/volley/+/4ad53e3321d9bed5a216d65623d92c91c5457e55)，此框架提供了一个请求队列(RequestQueue)，可以将网络请求添加至此队列，交给volley去发送。
+应用中的网络请求模块使用了Google提供的轻量级网络访问框架[volley](https://android.googlesource.com/platform/frameworks/volley/+/4ad53e3321d9bed5a216d65623d92c91c5457e55)，此框架提供了一个请求队列(RequestQueue)，可以将网络请求添加至此队列，交给volley去发送。与网络请求相关的API封装在[NetworkUtil.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/NetworkUtil.java)这个工具类中。
 
 有了这个框架，我们要做的就是将应用中的请求URL和请求参数封装起来。为此，我们先进行通用的GET请求和POST请求的封装：
 
@@ -713,9 +917,7 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 
 ## Data Analysis
 
-Source: [DBTestActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/test/DBTestActivity.java)
-
-Docs: [Database](./database.md) [Data Analysis](./data_analysis.md)
+文档：[Database](./database.md) [Data Analysis](./data_analysis.md)
 
 * Analyze using data in local database
 
