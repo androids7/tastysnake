@@ -2,7 +2,7 @@
 
 A snake battle game on Android.
 
-* [技术实现](./doc/implementation.md)
+[技术实现](./doc/implementation.md)
 
 ## Game Rules
 
