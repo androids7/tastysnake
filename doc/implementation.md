@@ -1,48 +1,28 @@
 # 技术实现
 
-* [Package Structure(包目录结构)](#package-structure)
+* [包目录结构](#包目录结构)
+* [游戏界面](#游戏界面)
+    * [两侧蛇的动画](#两侧蛇的动画)
+    * [游戏规则提示框](#游戏规则提示框)
+* [游戏元素](#游戏元素)
+    * [Pos](#pos)
+    * [Point](#point)
+    * [Map](#map)
+    * [Snake](#snake)
+* [绘图](#绘图)
+* [蓝牙通信](#蓝牙通信)
+    * [自定义数据包](#自定义数据包)
+* [传感器](#传感器)
+* [网络通信](#网络通信)
+* [本地数据库](#本地数据库)
+    * [数据库操作](#数据库操作)
+* [数据分析](#数据分析)
+    * [本地数据](#本地数据)
+    * [服务端数据](#服务端数据)
+    * [上传数据](#上传数据)
+* [服务器](#服务器)
 
-* [Game UI(游戏界面)](#game-ui)
-
-    * [SnakeImage(两侧蛇的动画)](#snakeimage)
-
-    * [HelpDialog(游戏规则Dialog)](#helpdialog)
-
-* [Game Elements(游戏元素)](#game-elements)
-
-    * [Pos(坐标二元组)](#pos)
-
-    * [Point(地图上的点)](#point)
-
-    * [Map(地图)](#map)
-
-    * [Snake(蛇)](#snake)
-
-* [Plot(地图绘制)](#plot)
-
-* [Bluetooth(蓝牙通信)](#bluetooth)
-
-    * [Custom Packet(自定义数据包)](#custom-packet)
-
-* [Sensor(传感器)](#sensor)
-
-* [Network(网络通信)](#network)
-
-* [Local Database(本地数据库)](#local-database)
-
-    * [Operations(数据库操作)](#operations)
-
-* [Data Analysis(数据分析)](#data-analysis)
-
-    * [Local(本地数据分析)](#local)
-
-    * [Remote(服务端数据分析)](#remote)
-
-    * [Upload(数据上传)](#upload)
-
-* [Server(服务器)](#server)
-
-## Package Structure
+## 包目录结构
 
 ```
 com.example.stevennl.tastysnake
@@ -55,7 +35,7 @@ com.example.stevennl.tastysnake
     widget      // 存放自定义控件
 ```
 
-## Game UI
+## 游戏界面
 
 游戏界面使用Activity + Fragment的方式编写，仅有一个Activity，即[GameActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/GameActivity.java)。四个游戏界面对应四个Fragment，组成如下：
 
@@ -64,9 +44,9 @@ com.example.stevennl.tastysnake
 |[HomeFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/HomeFragment.java)|![](./img/frag_home.png)|游戏主界面。点击红色的蛇进入数据分析界面，点击蓝色的蛇进行深色/浅色主题切换。|
 |[ConnectFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/ConnectFragment.java)|![](./img/frag_conn.png)|设备连接界面。下拉刷新将重新扫描设备，点击列表中的设备即可与该设备进行连接。|
 |[BattleFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/BattleFragment.java)|![](./img/frag_battle.png)|游戏对战界面。|
-|[AnalysisFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/AnalysisFragment.java)|![](./img/frag_analysis.png)|数据分析界面。|
+|[AnalysisFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/AnalysisFragment.java)|![](./img/frag_analysis.png)|数据分析界面。详细请参考[数据分析部分](#数据分析)。|
 
-### SnakeImage
+### 两侧蛇的动画
 
 注意到在游戏主界面和设备连接界面的两侧有一条红色和蓝色的蛇，在界面切换时将会产生如下动画：
 
@@ -187,7 +167,7 @@ public void startExit(@Nullable final AnimationEndListener endListener) {
 
 这两个方法都传入了一个`AnimationEndListener`接口，它将在动画播放结束时被调用。在界面刚打开时，动画结束之后才会执行该界面的逻辑，在退出界面时，动画结束之后才会真正切换到下一个界面，这就是这个回调接口的作用。
 
-### HelpDialog
+### 游戏规则提示框
 
 设备连接成功、游戏开始之前会显示如下的Dialog显示游戏规则：
 
@@ -195,7 +175,7 @@ public void startExit(@Nullable final AnimationEndListener endListener) {
 
 这个Dialog封装在了一个自定义控件[HelpDialog.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/HelpDialog.java)中，只需要调用`HelpDialog.show()`即可显示此Dialog。另外，此Dialog的构造函数中需要传入一个`DialogInterface.OnCancelListener`接口，它将在Dialog被关闭之后调用。
 
-## Game Elements
+## 游戏元素
 
 在进行游戏元素的搭建此之前，我们先定义一个[Direction.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Direction.java)枚举类表示游戏中的方向，移动方向只有上下左右四个，另外添加一个方向NONE，表示无移动方向：
 
@@ -400,7 +380,7 @@ private void genType();
 
 具体实现请参考源码。
 
-## Plot
+## 绘图
 
 整张地图的绘制方法封装在了[DrawableGrid.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/DrawableGrid.java)这个自定义控件中，在游戏界面的布局中我们只需要简单的添加这个控件即可在屏幕上显示一张地图：
 
@@ -429,7 +409,7 @@ grid.setMap(map);
 grid.setBgColor(Config.COLOR_MAP_BG);
 ```
 
-这里的`setMap(Map map)`方法将一张地图绑定到此控件，该控件每隔一定时间遍历地图中的Point数组，将每个点的信息绘制到屏幕上。关于Map和Point等元素的定义请参考[Game Elements](#game-elements)。
+这里的`setMap(Map map)`方法将一张地图绑定到此控件，该控件每隔一定时间遍历地图中的Point数组，将每个点的信息绘制到屏幕上。关于Map和Point等元素的定义请参考[游戏元素](#游戏元素)。
 
 了解了绘图过程之后，我们接下来看一下这个自定义控件的内部实现，它继承自SurfaceView，SurfaceView的特点是可以在子线程中绘图，这样在频繁绘图时不会阻塞主线程。我们首先需要给SurfaceView添加回调接口，以便在恰当的生命周期开始绘图与停止绘图：
 
@@ -559,7 +539,7 @@ private void drawMapContent(Canvas canvas) {
 
 `drawGrid()`方法根据Point的内容将图形绘制到指定位置，目前这个游戏的地图上的元素只有圆形、矩形，直接调用`canvas.drawRect()`和`canvas.drawCircle()`即可完成绘制，网上有许多资料说明如何用canvas绘制几何图形，这里就不再展开叙述了。
 
-## Bluetooth
+## 蓝牙通信
 
 蓝牙通信根据官方的[蓝牙通信文档](https://developer.android.com/guide/topics/connectivity/bluetooth.html)编写，基于Andorid的BluetoothAdapter实现。我们将与蓝牙通信相关的API封装在了[BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/BluetoothManager.java)这个工具类中，蓝牙的打开与设备发现过程官方文档已经有详细说明，这里不再展开叙述。蓝牙通信比较关键的地方在于三条线程的协调，首先是服务端的接收线程[AcceptThread.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/AcceptThread.java)，这条线程的`run()`方法如下：
 
@@ -749,7 +729,7 @@ public void write(byte[] data) {
 }
 ```
 
-### Custom Packet
+### 自定义数据包
 
 从上面的数据传输方式可以看到，数据以`byte[]`也就是字节流形式在两台设备之间进行传输。为了使传输数据更为方便，数据更加结构化，我们封装了一个自定义数据包[Packet.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Packet.java)，此数据包可以转换为`byte[]`，也可以利用`byte[]`进行构造，并且其大小是**固定的**(5 bytes)。
 
@@ -769,7 +749,7 @@ public void write(byte[] data) {
 |WIN|A: 胜利方。<br />B: 游戏结束的原因。|包含了游戏结束的信号，里面附带了胜利方以及获胜的原因。|
 |PREPARED|不需要存任何数据。|包含了准备完成的信号，只有双方均准备完成游戏才可以开始。|
 
-## Sensor
+## 传感器
 
 游戏中的蛇的移动方向是使用重力感应控制的，我们将与传感器相关的API封装在了[SensorController.java](../app/src/main/java/com/example/stevennl/tastysnake/util/sensor/SensorController.java)这个工具类中，它使用安卓设备提供的加速度传感器，获取x/y两个方向的加速度。为了获取初始数据确定x/y的使用，在测试中发现如下极端数据：（横屏）
 
@@ -787,18 +767,13 @@ public void write(byte[] data) {
 为了优化重力感应体验，使用一个加速度accXAcc、accYAcc，来衡量加速度xAccValue、yAccValue的变化速度，也就是衡量玩家游戏时摆动手机的速度。具体如下：
 
 1. 生成两个方法，供上层使用：在蛇做上下运动时，只判断左右方向；做左右运动时，只判断上下方向。
-
 2. ACC_BOUND可以调整加速度accXAcc的阈值，控制灵敏度。
-
 3. MIN_SEN可以控制判定的灵敏度，减少误操作。
-
 4. HIGH_SEN控制极端情况，保证在某一方向的极端操作得到响应。
-
 5. 此操作的优势之一是响应玩家摆动动作，而不是手机的加速度状态。另外，在向某一个角大幅度摆动时，可以得到“之”字型的走位。
-
 6. 优化的几个参数还在调整，可以在[sensor_optimize分支](https://github.com/stevennL/TastySnake/tree/sensor_optimize)下查看，目前还未与主分支合并。
 
-## Network
+## 网络通信
 
 应用中的网络请求模块使用了Google提供的轻量级网络访问框架[volley](https://android.googlesource.com/platform/frameworks/volley/+/4ad53e3321d9bed5a216d65623d92c91c5457e55)，此框架提供了一个请求队列(RequestQueue)，可以将网络请求添加至此队列，交给volley去发送。与网络请求相关的API封装在[NetworkUtil.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/NetworkUtil.java)这个工具类中。
 
@@ -943,7 +918,7 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 
 其余的请求方法如`getAllW()`、`removeW()`、`removeAllW()`等供调试使用，这里就不一一叙述了。
 
-## Local Database
+## 本地数据库
 
 数据库名: TastySnake.db
 
@@ -951,7 +926,7 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 
 数据库表：
 
-**1.battle_record**
+**battle_record:**
 
 | Name | Type In Code | Type In DB | Comment |
 |------|--------------|------------|---------|
@@ -962,7 +937,7 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 |myLength|int|INTEGER|对战结束时自身蛇长|
 |enemyLength|int|INTEGER|对战结束时对方蛇长|
 
-### Operations
+### 数据库操作
 
 对本地数据库的操作封装在[DBHelper.java](../app/src/main/java/com/example/stevennl/tastysnake/util/DBHelper.java)中。
 
@@ -970,43 +945,31 @@ battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/e
 
 // TODO 关键源码分析
 
-## Data Analysis
+## 数据分析
 
-我们对本地数据库和服务器数据库中的数据进行分析。
+我们利用本地数据库和服务器数据库中的数据进行玩家能力分析。
 
-### Local
-
-对本地数据库中的数据进行分析。
+### 本地数据
 
 #### 描述
 
 1. 您到目前为止一共进行了N局游戏。
-
 2. 赢X局，其中智商碾压A局，侥幸获胜B局。
-
 3. 输Y局，其中被对方戏耍C局，因失误失败D局。
-
 4. 每一局的平均时长为T秒。
-
 5. 每一局你的蛇的平均长度为L1节。
-
 6. 每一局对方的蛇的平均长度为L2节。
-
 7. 您的能力指数为W。
-
 8. 您的技术评估为P。
 
 #### 定义
 
-智商碾压：win=true && cause=HIT_ENEMY
-
-侥幸获胜：win=true && (cause=OUT || cause=SUICIDE)
-
-被对方戏耍：win=false && cause=HIT_ENEMY
-
-因失误失败：win=false && (cause=OUT || cause=SUICIDE)
-
-W = (100/N)\*((7\*A+5\*B)\*(18-log2(T+1))+(1\*C+3\*D)\*log2(T+2))
+1. 智商碾压：`win=true && cause=HIT_ENEMY`
+2. 侥幸获胜：`win=true && (cause=OUT || cause=SUICIDE)`
+3. 被对方戏耍：`win=false && cause=HIT_ENEMY`
+4. 因失误失败：`win=false && (cause=OUT || cause=SUICIDE)`
+5. `W = (100/N)\*((7\*A+5\*B)\*(18-log2(T+1))+(1\*C+3\*D)\*log2(T+2))`
+6. P值计算如下：
 
 | P | Range |
 |:-:|:-----:|
@@ -1016,7 +979,7 @@ W = (100/N)\*((7\*A+5\*B)\*(18-log2(T+1))+(1\*C+3\*D)\*log2(T+2))
 |白银|1500 <= W < 3800|
 |青铜|W < 1500|
 
-使用这个[MATLAB程序](./program/formula_test.m)可以测试W和P的函数曲线。
+可以使用这个[MATLAB程序](./program/formula_test.m)测试W和P的函数曲线。
 
 #### 数据封装
 
@@ -1024,16 +987,12 @@ W = (100/N)\*((7\*A+5\*B)\*(18-log2(T+1))+(1\*C+3\*D)\*log2(T+2))
 
 // TODO 关键源码分析
 
-### Remote
-
-对服务器数据库中的数据进行分析。
+### 服务端数据
 
 #### 描述
 
 1. 您的能力高出平均水平U%，值得鼓励！
-
 2. 您的能力等于平均水平，加油！
-
 3. 您的能力低于平均水平U%，再加把劲！
 
 #### 定义
@@ -1051,13 +1010,13 @@ if (W > avg) {
 }
 ```
 
-### Upload
+### 上传数据
 
 使用[UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)上传数据。
 
 // TODO 关键源码分析
 
-## Server
+## 服务器
 
 服务器使用`play2`框架，其优点在于访问并发控制和jdbc并发控制都已经通过进程池封装完成，而且有很成熟的MVC框架，http引擎是java内置的netty。服务器端的架构是MVC，model是一个支持CRUD的封装后的数据库，通过依赖注入的方式注入controller，controller负责处理具体的网络请求。
 由于客户端只会请求所有战斗力的平均值，所以在内存中保存一个聚合操作的中间结果---sum，并保证这个结果和数据库是一致的，这就要求`model.Data`是一个`Eager Singleton`，在处理查询和插入时，维护sum。
