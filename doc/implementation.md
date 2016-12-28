@@ -24,11 +24,23 @@
 
 * [Bluetooth(蓝牙通信)](#bluetooth)
 
+    * [Custom Packet(自定义数据包)](#custom-packet)
+
 * [Sensor(传感器)](#sensor)
 
 * [Network(网络通信)](#network)
 
+* [Local Database(本地数据库)](#local-database)
+
+    * [Operations(数据库操作)](#operations)
+
 * [Data Analysis(数据分析)](#data-analysis)
+
+    * [Local(本地数据分析)](#local)
+
+    * [Remote(云端数据分析)](#remote)
+
+    * [Upload(数据上传)](#upload)
 
 * [Server(服务器)](#server)
 
@@ -739,7 +751,25 @@ public void write(byte[] data) {
 }
 ```
 
-由于在底层传输的数据都是byte[]，也就是字节流形式。为了使传输数据更为方便，数据更加结构化，我们封装了一个[自定义数据包](./custom_packet.md)，此数据包可以转换为byte[]，也可以利用byte[]进行构造。
+### Custom Packet
+
+从上面的数据传输方式可以看到，数据以`byte[]`也就是字节流形式在两台设备之间进行传输。为了使传输数据更为方便，数据更加结构化，我们封装了一个自定义数据包[Packet.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Packet.java)，此数据包可以转换为`byte[]`，也可以利用`byte[]`进行构造，并且其大小是**固定的**(5 bytes)。
+
+为了完成`Packet`和`byte[]`的相互转换，我们用`String`作为桥梁，即每个`Packet`可以等价的表示为一个`String`，而`String`对象是可以利用java的API和`byte[]`类型相互转换的。
+
+我们将每个数据包表示为字符串TABCD，每个字母代表一个字符，字符T标识数据包的类型，字符A、B、C、D存放数据包的数据。若数据长度不够，采用空格填充。
+
+以下是游戏中所用到的自定义数据包：
+
+| Type | Data | Description |
+|:----:|------|-------------|
+|FOOD_LENGTHEN|AB: 食物的横坐标。<br />CD: 食物的纵坐标。|包含一个变长食物的位置。|
+|FOOD_SHORTEN|AB: 食物的横坐标。<br />CD: 食物的纵坐标。|包含一个变短食物的位置。|
+|MOVE|A: 移动方向。|包含一个蛇的移动方向。|
+|RESTART|A: 新一轮游戏的攻击方。|包含重新开始游戏的信号，里面附带了新一轮游戏的攻击方。|
+|TIME|AB: 攻防切换的剩余时间。|包含了对战中攻防切换的剩余时间。|
+|WIN|A: 胜利方。<br />B: 游戏结束的原因。|包含了游戏结束的信号，里面附带了胜利方以及获胜的原因。|
+|PREPARED|不需要存任何数据。|包含了准备完成的信号，只有双方均准备完成游戏才可以开始。|
 
 ## Sensor
 
@@ -915,15 +945,109 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 
 其余的请求方法如`getAllW()`、`removeW()`、`removeAllW()`等供调试使用，这里就不一一叙述了。
 
+## Local Database
+
+数据库名: TastySnake.db
+
+数据库版本: 1
+
+数据库表：
+
+**1.battle_record**
+
+| Name | Type In Code | Type In DB | Comment |
+|------|--------------|------------|---------|
+|timestamp|java.util.Date|TEXT|对战结束时的时间戳 (年/月/日 + 时/分/秒)
+|win|boolean|INTEGER|对战结果：赢/输|
+|cause|Snake.MoveResult|INTEGER|对战结束的原因：OUT、SUICIDE或HIT_ENEMY|
+|duration|int|INTEGER|对战的持续时间(秒)|
+|myLength|int|INTEGER|对战结束时自身蛇长|
+|enemyLength|int|INTEGER|对战结束时对方蛇长|
+
+### Operations
+
+对本地数据库的操作封装在[DBHelper.java](../app/src/main/java/com/example/stevennl/tastysnake/util/DBHelper.java)中。
+
+battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/example/stevennl/tastysnake/model/BattleRecord.java)中。
+
 ## Data Analysis
 
-文档：[Database](./database.md) [Data Analysis](./data_analysis.md)
+我们对本地数据库和服务器数据库中的数据进行分析。
 
-* Analyze using data in local database
+### Local
 
-* Analyze using data from remote server
+对本地数据库中的数据进行分析。
 
-* Upload local data to remote through [UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)
+#### 描述
+
+1. 您到目前为止一共进行了N局游戏。
+
+2. 赢X局，其中智商碾压A局，侥幸获胜B局。
+
+3. 输Y局，其中被对方戏耍C局，因失误失败D局。
+
+4. 每一局的平均时长为T秒。
+
+5. 每一局你的蛇的平均长度为L1节。
+
+6. 每一局对方的蛇的平均长度为L2节。
+
+7. 您的能力指数为W。
+
+8. 您的技术评估为P。
+
+#### 定义
+
+智商碾压：win=true && cause=HIT_ENEMY
+
+侥幸获胜：win=true && (cause=OUT || cause=SUICIDE)
+
+被对方戏耍：win=false && cause=HIT_ENEMY
+
+因失误失败：win=false && (cause=OUT || cause=SUICIDE)
+
+W = (100/N)\*((7\*A+5\*B)\*(18-log2(T+1))+(1\*C+3\*D)\*log2(T+2))
+
+| P | Range |
+|:-:|:-----:|
+|王者|W >= 8500|
+|大师|6100 <= W < 8500|
+|黄金|3800 <= W < 6100|
+|白银|1500 <= W < 3800|
+|青铜|W < 1500|
+
+使用这个[MATLAB程序](./program/formula_test.m)可以测试W和P的函数曲线。
+
+### Remote
+
+对服务器数据库中的数据进行分析。
+
+#### 描述
+
+1. 您的能力高出平均水平U%，值得鼓励！
+
+2. 您的能力等于平均水平，加油！
+
+3. 您的能力低于平均水平U%，再加把劲！
+
+#### 定义
+
+```java
+avg = getAvgWValueFromServer();
+if (W > avg) {
+    showDescription1();
+    U = 100 * (W - avg) / avg;
+} else if (W == avg) {
+    showDescription2();
+} else if (W < avg) {
+    showDescription3();
+    U = 100 * (avg - W) / avg;
+}
+```
+
+### Upload
+
+使用[UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)上传数据。
 
 ## Server
 
