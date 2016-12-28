@@ -927,8 +927,104 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 
 ## Server
 
-* Server config
+### 后端设计
+服务器使用`play2`框架，其优点在于访问并发控制和jdbc并发控制都已经通过进程池封装完成，而且有很成熟的MVC框架，http引擎是java内置的netty。服务器端的架构是MVC，model是一个支持CRUD的封装后的数据库，通过依赖注入的方式注入controller，controller负责处理具体的网络请求。
+由于客户端只会请求所有战斗力的平均值，所以在内存中保存一个聚合操作的中间结果---sum，并保证这个结果和数据库是一致的，这就要求`model.Data`是一个`Eager Singleton`，在处理查询和插入时，维护sum。
+调试功能包括：删除指定id，清空数据库
+### 插入操作
+插入操作需要区分该id是第一次插入还是需要更新一个已有的id，这两种方法对于sum的更新是不同的。
+### 查询操作
+查询操作需要获取平均值，sum是已经维护好的，那么如何快速获取数据库的行数呢，使用mysql的SCHEMA数据库`INFORMATION_SCHEMA.INNODB_TABLE_STATS`，在其中按照表名查询就可以获得表的`rows`属性，这样我们查询操作的总体复杂度是常数时间。
+处理POST参数使用模式匹配的方法。
 
-* Insert new W value
+### 路由表
+```
+# Home page
+GET     /                           controllers.Application.index
 
-* Calculate average W value
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+# List All
+GET    /w/all                       controllers.Application.listAll
+
+# Query Mean
+GET     /w/mean                     controllers.Application.queryMean
+
+# Update W
+POST   /w                           controllers.Application.update
+
+# TRUNCATE W
+GET    /w/clear                     controllers.Application.truncate
+
+# Delete id
+GET    /w/remove                    controllers.Application.delete(id: String ?= "")
+```
+
+
+### Controller
+```java
+class Application @Inject() (data: model.Data) extends Controller {
+  def index = Action {Ok("Hello World")}
+  def queryMean = Action {Ok(data.getSum / data.getRow)}
+  def listAll = Action {Ok(data.getAllUsers)}
+  def truncate = Action {data.truncate;Ok("database cleared");}
+  def delete(id: String) = Action { implicit request =>
+    data.delete(id)
+    Ok(id + " deleted")
+  }
+  case class UserData(id: String, value: Int)
+  val userForm = Form(
+    mapping(
+      "id" -> text,
+      "w" -> number
+    )(UserData.apply)(UserData.unapply)
+  )
+  def update = Action { implicit request =>
+    userForm.bindFromRequest.fold(
+      err => BadRequest,
+      userData => {
+        val (flag, rec) = data.exist(userData.id)
+        if (flag) {
+          data.update(userData.id, userData.value, rec)
+        } else {
+          data.insert(userData.id, userData.value)
+        }
+        Ok("OK")
+      }
+    )
+  }
+}
+```
+### Model
+```java
+class Data @Inject()(db: Database) {
+  @volatile private var sum = 0
+  def getSum: Int
+  def getRow: Int
+  /**
+  * 检查id是否存在
+  */
+  def exist(id: String): (Boolean, Int)
+  /**
+  * 插入新值
+  */
+  def insert(id: String, value: Int): Unit
+  /**
+  * 更新用户战斗力
+  */
+  def update(id: String, value: Int, old: Int): Unit
+  /**
+  * 列出所有用户
+  */
+  def getAllUsers: String
+  /**
+  * 清空数据库
+  */
+  def truncate: Unit
+  /**
+  * 删除指定id
+  */
+  def delete(id: String): Unit
+}
+```
