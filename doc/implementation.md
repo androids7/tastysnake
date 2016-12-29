@@ -44,7 +44,7 @@ com.example.stevennl.tastysnake
 |[HomeFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/HomeFragment.java)|![](./img/frag_home.png)|游戏主界面。点击红色的蛇进入数据分析界面，点击蓝色的蛇进行深色/浅色主题切换。|
 |[ConnectFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/ConnectFragment.java)|![](./img/frag_conn.png)|设备连接界面。下拉刷新将重新扫描设备，点击列表中的设备即可与该设备进行连接。|
 |[BattleFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/BattleFragment.java)|![](./img/frag_battle.png)|游戏对战界面。|
-|[AnalysisFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/AnalysisFragment.java)|![](./img/frag_analysis.png)|数据分析界面。详细请参考[数据分析部分](#数据分析)。|
+|[AnalysisFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/AnalysisFragment.java)|![](./img/frag_analysis.png)|数据分析界面。详细请参考[数据分析](#数据分析)。|
 
 ### 两侧蛇的动画
 
@@ -847,7 +847,7 @@ public interface ResultListener<T> {
 }
 ```
 
-接下来进行具体请求的封装，第一个需要用到的请求是向服务器发送最新统计出的能力指数值W，关于数据统计的细节可以直接看[数据分析部分](#data-analysis)。我们使用POST请求完成这项功能，参数除了附带W值，还要附带上设备的ID号：
+接下来进行具体请求的封装，第一个需要用到的请求是向服务器发送最新统计出的能力指数值W，关于数据统计的细节可以直接看[数据分析](#数据分析)。我们使用POST请求完成这项功能，参数除了附带W值，还要附带上设备的ID号：
 
 ```java
 /**
@@ -964,12 +964,12 @@ battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/e
 
 #### 定义
 
-1. 智商碾压：`win=true && cause=HIT_ENEMY`
-2. 侥幸获胜：`win=true && (cause=OUT || cause=SUICIDE)`
-3. 被对方戏耍：`win=false && cause=HIT_ENEMY`
-4. 因失误失败：`win=false && (cause=OUT || cause=SUICIDE)`
-5. `W = (100/N)\*((7\*A+5\*B)\*(18-log2(T+1))+(1\*C+3\*D)\*log2(T+2))`
-6. P值计算如下：
+* 智商碾压：`win == true && cause == HIT_ENEMY`
+* 侥幸获胜：`win == true && (cause == OUT || cause == SUICIDE)`
+* 被对方戏耍：`win == false && cause == HIT_ENEMY`
+* 因失误失败：`win == false && (cause == OUT || cause == SUICIDE)`
+* `W = (100/N)*((7*A+5*B)*(18-log2(T+1))+(1*C+3*D)*log2(T+2))`
+* P的计算如下：
 
 | P | Range |
 |:-:|:-----:|
@@ -979,7 +979,7 @@ battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/e
 |白银|1500 <= W < 3800|
 |青铜|W < 1500|
 
-可以使用这个[MATLAB程序](./program/formula_test.m)测试W和P的函数曲线。
+（可以使用这个[MATLAB程序](./program/formula_test.m)测试W和P的函数曲线）
 
 #### 数据封装
 
