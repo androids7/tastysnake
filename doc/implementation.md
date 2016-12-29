@@ -1,27 +1,42 @@
 # 技术实现
 
-* [包目录结构](#包目录结构)
-* [游戏界面](#游戏界面)
-    * [两侧蛇的动画](#两侧蛇的动画)
-    * [游戏规则提示框](#游戏规则提示框)
-* [游戏元素](#游戏元素)
-    * [Pos](#pos)
-    * [Point](#point)
-    * [Map](#map)
-    * [Snake](#snake)
-* [绘图](#绘图)
-* [蓝牙通信](#蓝牙通信)
-    * [自定义数据包](#自定义数据包)
-* [传感器](#传感器)
-* [网络通信](#网络通信)
-* [本地数据库](#本地数据库)
-    * [数据库操作](#数据库操作)
-* [数据分析](#数据分析)
-    * [本地数据](#本地数据)
-    * [服务端数据](#服务端数据)
-    * [上传数据](#上传数据)
-* [服务器](#服务器)
+<!-- MarkdownTOC -->
 
+- [包目录结构](#包目录结构)
+- [游戏界面](#游戏界面)
+    - [两侧蛇的动画](#两侧蛇的动画)
+    - [游戏规则提示框](#游戏规则提示框)
+- [游戏元素](#游戏元素)
+    - [Pos](#pos)
+    - [Point](#point)
+    - [Map](#map)
+    - [Snake](#snake)
+- [绘图](#绘图)
+- [蓝牙通信](#蓝牙通信)
+    - [自定义数据包](#自定义数据包)
+- [传感器](#传感器)
+- [网络通信](#网络通信)
+- [本地数据库](#本地数据库)
+    - [数据库操作](#数据库操作)
+- [数据分析](#数据分析)
+    - [本地数据](#本地数据)
+        - [描述](#描述)
+        - [定义](#定义)
+        - [封装](#封装)
+    - [服务端数据](#服务端数据)
+        - [描述](#描述-1)
+        - [定义](#定义-1)
+    - [上传数据](#上传数据)
+- [服务器](#服务器)
+    - [插入操作](#插入操作)
+    - [查询操作](#查询操作)
+    - [路由表](#路由表)
+    - [Controller](#controller)
+    - [Model](#model)
+
+<!-- /MarkdownTOC -->
+
+<a name="包目录结构"></a>
 ## 包目录结构
 
 ```
@@ -35,6 +50,7 @@ com.example.stevennl.tastysnake
     widget      // 存放自定义控件
 ```
 
+<a name="游戏界面"></a>
 ## 游戏界面
 
 游戏界面使用Activity + Fragment的方式编写，仅有一个Activity，即[GameActivity.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/GameActivity.java)。四个游戏界面对应四个Fragment，组成如下：
@@ -46,6 +62,7 @@ com.example.stevennl.tastysnake
 |[BattleFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/BattleFragment.java)|![](./img/frag_battle.png)|游戏对战界面。|
 |[AnalysisFragment.java](../app/src/main/java/com/example/stevennl/tastysnake/controller/game/AnalysisFragment.java)|![](./img/frag_analysis.png)|数据分析界面。详细请参考[数据分析](#数据分析)。|
 
+<a name="两侧蛇的动画"></a>
 ### 两侧蛇的动画
 
 注意到在游戏主界面和设备连接界面的两侧有一条红色和蓝色的蛇，在界面切换时将会产生如下动画：
@@ -167,6 +184,7 @@ public void startExit(@Nullable final AnimationEndListener endListener) {
 
 这两个方法都传入了一个`AnimationEndListener`接口，它将在动画播放结束时被调用。在界面刚打开时，动画结束之后才会执行该界面的逻辑，在退出界面时，动画结束之后才会真正切换到下一个界面，这就是这个回调接口的作用。
 
+<a name="游戏规则提示框"></a>
 ### 游戏规则提示框
 
 设备连接成功、游戏开始之前会显示如下的Dialog显示游戏规则：
@@ -175,6 +193,7 @@ public void startExit(@Nullable final AnimationEndListener endListener) {
 
 这个Dialog封装在了一个自定义控件[HelpDialog.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/HelpDialog.java)中，只需要调用`HelpDialog.show()`即可显示此Dialog。另外，此Dialog的构造函数中需要传入一个`DialogInterface.OnCancelListener`接口，它将在Dialog被关闭之后调用。
 
+<a name="游戏元素"></a>
 ## 游戏元素
 
 在进行游戏元素的搭建此之前，我们先定义一个[Direction.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Direction.java)枚举类表示游戏中的方向，移动方向只有上下左右四个，另外添加一个方向NONE，表示无移动方向：
@@ -191,6 +210,7 @@ public enum Direction {
 
 游戏元素的搭建主要由Pos、Point、Map、Snake这四个类完成，下面分别进行讲述。
 
+<a name="pos"></a>
 ### Pos
 
 [Pos.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Pos.java)是一个二维平面的坐标二元组，里面只有两个属性：x和y，表示平面上的横坐标与纵坐标。在我们的地图上，横坐标对应行号，纵坐标对应列号。这个类提供两个主要方法：
@@ -220,6 +240,7 @@ public Direction getDirectionRelativeTo(Pos p) {
 
 `getPosAt(Direction k)`用于获取邻接位置的坐标，`getDirectionRelativeTo(Pos p)`用于获取当前位置相对于邻接位置的方向。
 
+<a name="point"></a>
 ### Point
 
 [Point.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Point.java)是地图上任意一个点，在每个点我们储存该点的类型和颜色值：
@@ -253,6 +274,7 @@ public class Point {
 
 注意到Type中4个HEAD开头的值表示了朝向四个方向的蛇头，BODY_HOR和BODY_VER分别表示水平和垂直的身体，最后的4个BODY开头的值表示拐弯部分的蛇身。另外，FOOD_SHORTEN表示吃了能让蛇变短的食物，基于游戏策略的考虑，我们暂时没把这类食物加入游戏中。
 
+<a name="map"></a>
 ### Map
 
 [Map.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Map.java)是游戏地图，显然，这里面存放了一个Point二维数组：
@@ -311,6 +333,7 @@ public Point getPoint(int x, int y) {
 
 这几个方法都是一目了然的，这里不做过多的介绍。
 
+<a name="snake"></a>
 ### Snake
 
 [Snake.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Snake.java)是游戏中移动的蛇，该类有如下几个属性：
@@ -380,6 +403,7 @@ private void genType();
 
 具体实现请参考源码。
 
+<a name="绘图"></a>
 ## 绘图
 
 整张地图的绘制方法封装在了[DrawableGrid.java](../app/src/main/java/com/example/stevennl/tastysnake/widget/DrawableGrid.java)这个自定义控件中，在游戏界面的布局中我们只需要简单的添加这个控件即可在屏幕上显示一张地图：
@@ -539,6 +563,7 @@ private void drawMapContent(Canvas canvas) {
 
 `drawGrid()`方法根据Point的内容将图形绘制到指定位置，目前这个游戏的地图上的元素只有圆形、矩形，直接调用`canvas.drawRect()`和`canvas.drawCircle()`即可完成绘制，网上有许多资料说明如何用canvas绘制几何图形，这里就不再展开叙述了。
 
+<a name="蓝牙通信"></a>
 ## 蓝牙通信
 
 蓝牙通信根据官方的[蓝牙通信文档](https://developer.android.com/guide/topics/connectivity/bluetooth.html)编写，基于Andorid的BluetoothAdapter实现。我们将与蓝牙通信相关的API封装在了[BluetoothManager.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/BluetoothManager.java)这个工具类中，蓝牙的打开与设备发现过程官方文档已经有详细说明，这里不再展开叙述。蓝牙通信比较关键的地方在于三条线程的协调，首先是服务端的接收线程[AcceptThread.java](../app/src/main/java/com/example/stevennl/tastysnake/util/bluetooth/thread/AcceptThread.java)，这条线程的`run()`方法如下：
@@ -729,6 +754,7 @@ public void write(byte[] data) {
 }
 ```
 
+<a name="自定义数据包"></a>
 ### 自定义数据包
 
 从上面的数据传输方式可以看到，数据以`byte[]`也就是字节流形式在两台设备之间进行传输。为了使传输数据更为方便，数据更加结构化，我们封装了一个自定义数据包[Packet.java](../app/src/main/java/com/example/stevennl/tastysnake/model/Packet.java)，此数据包可以转换为`byte[]`，也可以利用`byte[]`进行构造，并且其大小是**固定的**(5 bytes)。
@@ -749,6 +775,7 @@ public void write(byte[] data) {
 |WIN|A: 胜利方。<br />B: 游戏结束的原因。|包含了游戏结束的信号，里面附带了胜利方以及获胜的原因。|
 |PREPARED|不需要存任何数据。|包含了准备完成的信号，只有双方均准备完成游戏才可以开始。|
 
+<a name="传感器"></a>
 ## 传感器
 
 游戏中的蛇的移动方向是使用重力感应控制的，我们将与传感器相关的API封装在了[SensorController.java](../app/src/main/java/com/example/stevennl/tastysnake/util/sensor/SensorController.java)这个工具类中，它使用安卓设备提供的加速度传感器，获取x/y两个方向的加速度。为了获取初始数据确定x/y的使用，在测试中发现如下极端数据：（横屏）
@@ -773,6 +800,7 @@ public void write(byte[] data) {
 5. 此操作的优势之一是响应玩家摆动动作，而不是手机的加速度状态。另外，在向某一个角大幅度摆动时，可以得到“之”字型的走位。
 6. 优化的几个参数还在调整，可以在[sensor_optimize分支](https://github.com/stevennL/TastySnake/tree/sensor_optimize)下查看，目前还未与主分支合并。
 
+<a name="网络通信"></a>
 ## 网络通信
 
 应用中的网络请求模块使用了Google提供的轻量级网络访问框架[volley](https://android.googlesource.com/platform/frameworks/volley/+/4ad53e3321d9bed5a216d65623d92c91c5457e55)，此框架提供了一个请求队列(RequestQueue)，可以将网络请求添加至此队列，交给volley去发送。与网络请求相关的API封装在[NetworkUtil.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/NetworkUtil.java)这个工具类中。
@@ -918,6 +946,7 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 
 其余的请求方法如`getAllW()`、`removeW()`、`removeAllW()`等供调试使用，这里就不一一叙述了。
 
+<a name="本地数据库"></a>
 ## 本地数据库
 
 数据库名: TastySnake.db
@@ -937,6 +966,7 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 |myLength|int|INTEGER|对战结束时自身蛇长|
 |enemyLength|int|INTEGER|对战结束时对方蛇长|
 
+<a name="数据库操作"></a>
 ### 数据库操作
 
 对本地数据库的操作封装在[DBHelper.java](../app/src/main/java/com/example/stevennl/tastysnake/util/DBHelper.java)中。
@@ -945,12 +975,15 @@ battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/e
 
 // TODO 关键源码分析
 
+<a name="数据分析"></a>
 ## 数据分析
 
 我们利用本地数据库和服务器数据库中的数据进行玩家能力分析。
 
+<a name="本地数据"></a>
 ### 本地数据
 
+<a name="描述"></a>
 #### 描述
 
 1. 您到目前为止一共进行了N局游戏。
@@ -962,6 +995,7 @@ battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/e
 7. 您的能力指数为W。
 8. 您的技术评估为P。
 
+<a name="定义"></a>
 #### 定义
 
 * 智商碾压：`win == true && cause == HIT_ENEMY`
@@ -981,20 +1015,24 @@ battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/e
 
 （可以使用这个[MATLAB程序](./program/formula_test.m)测试W和P的函数曲线）
 
-#### 数据封装
+<a name="封装"></a>
+#### 封装
 
 我们将本地数据分析的API与计算结果封装在[AnalysisData.java](../app/src/main/java/com/example/stevennl/tastysnake/model/AnalysisData.java)中。
 
 // TODO 关键源码分析
 
+<a name="服务端数据"></a>
 ### 服务端数据
 
+<a name="描述-1"></a>
 #### 描述
 
 1. 您的能力高出平均水平U%，值得鼓励！
 2. 您的能力等于平均水平，加油！
 3. 您的能力低于平均水平U%，再加把劲！
 
+<a name="定义-1"></a>
 #### 定义
 
 ```java
@@ -1010,27 +1048,32 @@ if (W > avg) {
 }
 ```
 
+<a name="上传数据"></a>
 ### 上传数据
 
 使用[UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)上传数据。
 
 // TODO 关键源码分析
 
+<a name="服务器"></a>
 ## 服务器
 
 服务器使用`play2`框架，其优点在于访问并发控制和jdbc并发控制都已经通过进程池封装完成，而且有很成熟的MVC框架，http引擎是java内置的netty。服务器端的架构是MVC，model是一个支持CRUD的封装后的数据库，通过依赖注入的方式注入controller，controller负责处理具体的网络请求。
 由于客户端只会请求所有战斗力的平均值，所以在内存中保存一个聚合操作的中间结果---sum，并保证这个结果和数据库是一致的，这就要求`model.Data`是一个`Eager Singleton`，在处理查询和插入时，维护sum。
 调试功能包括：删除指定id，清空数据库。
 
+<a name="插入操作"></a>
 ### 插入操作
 
 插入操作需要区分该id是第一次插入还是需要更新一个已有的id，这两种方法对于sum的更新是不同的。
 
+<a name="查询操作"></a>
 ### 查询操作
 
 查询操作需要获取平均值，sum是已经维护好的，那么如何快速获取数据库的行数呢，使用mysql的SCHEMA数据库`INFORMATION_SCHEMA.INNODB_TABLE_STATS`，在其中按照表名查询就可以获得表的`rows`属性，这样我们查询操作的总体复杂度是常数时间。
 处理POST参数使用模式匹配的方法。
 
+<a name="路由表"></a>
 ### 路由表
 
 ```
@@ -1056,6 +1099,7 @@ GET    /w/clear                     controllers.Application.truncate
 GET    /w/remove                    controllers.Application.delete(id: String ?= "")
 ```
 
+<a name="controller"></a>
 ### Controller
 
 ```java
@@ -1092,6 +1136,7 @@ class Application @Inject() (data: model.Data) extends Controller {
 }
 ```
 
+<a name="model"></a>
 ### Model
 
 ```java
