@@ -974,6 +974,170 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/example/stevennl/tastysnake/model/BattleRecord.java)中。
 
 // TODO 关键源码分析
+数据库中存储的数据每个项目作为私有成员封装在BattleRecord中
+```java
+/**
+ * Record of one battle.
+ */
+public class BattleRecord {
+    private Date timestamp;
+    private boolean win;
+    private Snake.MoveResult cause;
+    private int duration;
+    private int myLength;
+    private int enemyLength;
+
+public BattleRecord() {
+}
+
+public BattleRecord(boolean win, Snake.MoveResult cause,
+					int duration, int myLength, int enemyLength) {
+	timestamp = new Date(System.currentTimeMillis());
+	this.win = win;
+	this.cause = cause;
+	this.duration = duration;
+	this.myLength = myLength;
+	this.enemyLength = enemyLength;
+}
+
+@Override
+public String toString() {
+	return CommonUtil.formatDate(timestamp) + " " + win + " " + cause.name()
+			+ " " + duration + " " + myLength + " " + enemyLength;
+}
+```
+
+
+为了尽可能减少Controller的工作量，由Battlerecord进行对数据库的访问。访问操作包括“将当前数据存入数据库”、“得到数据库中所有数据”、“清空数据库“。
+```java
+/**
+ * Insert this record to database.
+ *
+ * @param context The context
+ */
+public void save(Context context) {
+	DBHelper.getInstance(context).insert(this);
+}
+
+/**
+ * Return all the BattleRecord in database.
+ *
+ * @param context The context
+ */
+public static ArrayList<BattleRecord> getAll(Context context) {
+	return DBHelper.getInstance(context).getAllRecords();
+}
+
+/**
+ * Remove all the BattleRecord from database.
+ *
+ * @param context The context
+ */
+public static void removeAll(Context context) {
+	DBHelper.getInstance(context).removeAllRecords();
+}
+```
+
+数据库的实现继承SQLiteOpenHelper类，对数据库进行简单的读写操作。
+用单例模式实现：
+```java
+/**
+ * Return the only instance.
+ */
+public static DBHelper getInstance(Context context) {
+	if (instance == null) {
+		instance = new DBHelper(context);
+	}
+	return instance;
+}
+
+/**
+ * Initialize.
+ */
+private DBHelper(Context context) {
+	super(context, DB_NAME, null, DB_VERSION);
+}
+
+@Override
+public void onCreate(SQLiteDatabase db) {
+	String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BATTLE_RECORD
+			+ " (" + TABLE_COL[0] + " TEXT, "
+			+ TABLE_COL[1] + " INTEGER, "
+			+ TABLE_COL[2] + " INTEGER, "
+			+ TABLE_COL[3] + " INTEGER, "
+			+ TABLE_COL[4] + " INTEGER, "
+			+ TABLE_COL[5] + " INTEGER)";
+	db.execSQL(CREATE_TABLE);
+}
+
+@Override
+public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	// Do nothing
+}
+```
+
+具体操作包括：
+插入当前数据项：
+```java
+/**
+ * Insert a battle record to database.
+ */
+public void insert(BattleRecord record) {
+	SQLiteDatabase db = getWritableDatabase();
+	ContentValues cv = new ContentValues();
+	String timestamp = CommonUtil.formatDate(record.getTimestamp());
+	boolean win = record.isWin();
+	int cause = record.getCause().ordinal();
+	int duration = record.getDuration();
+	int myLength = record.getMyLength();
+	int enemyLength = record.getEnemyLength();
+	cv.put(TABLE_COL[0], timestamp);
+	cv.put(TABLE_COL[1], win);
+	cv.put(TABLE_COL[2], cause);
+	cv.put(TABLE_COL[3], duration);
+	cv.put(TABLE_COL[4], myLength);
+	cv.put(TABLE_COL[5], enemyLength);
+	db.insert(TABLE_BATTLE_RECORD, null, cv);
+	db.close();
+}
+```
+	
+读取所有数据项：
+```java
+/**
+ * Return all battle records in database.
+ */
+public ArrayList<BattleRecord> getAllRecords() {
+	ArrayList<BattleRecord> db_records = new ArrayList<>();
+	SQLiteDatabase db = getReadableDatabase();
+	Cursor cursor = db.query(TABLE_BATTLE_RECORD, TABLE_COL, null, null, null, null, null);
+	while (cursor.moveToNext()) {
+		BattleRecord temp = new BattleRecord();
+		temp.setTimestamp(CommonUtil.parseDateStr(cursor.getString(cursor.getColumnIndex(TABLE_COL[0]))));
+		temp.setWin(cursor.getInt(cursor.getColumnIndex(TABLE_COL[1])) > 0);
+		temp.setCause(Snake.MoveResult.values()[cursor.getInt(cursor.getColumnIndex(TABLE_COL[2]))]);
+		temp.setDuration(cursor.getInt(cursor.getColumnIndex(TABLE_COL[3])));
+		temp.setMyLength(cursor.getInt(cursor.getColumnIndex(TABLE_COL[4])));
+		temp.setEnemyLength(cursor.getInt(cursor.getColumnIndex(TABLE_COL[5])));
+		db_records.add(temp);
+	}
+	cursor.close();
+	db.close();
+	return db_records;
+}
+```
+
+清空所有数据项：
+```java
+/**
+ * Remove all battle records.
+ */
+public void removeAllRecords() {
+	SQLiteDatabase db = getWritableDatabase();
+	db.delete(TABLE_BATTLE_RECORD, null, new String[]{});
+	db.close();
+}
+```
 
 <a name="数据分析"></a>
 ## 数据分析
@@ -1021,6 +1185,78 @@ battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/e
 我们将本地数据分析的API与计算结果封装在[AnalysisData.java](../app/src/main/java/com/example/stevennl/tastysnake/model/AnalysisData.java)中。
 
 // TODO 关键源码分析
+目的是为了根据本地数据库计算出玩家目前为止所有游戏的综合情况，作为一个AnalysisData类型的数据返回：
+将每一项需要计算的指标当成私有成员放在AnalysisData类中，在对每一项指标进行计算处理：
+```java
+/**
+ * Create data to analyze.
+ *
+ * @param context The context
+ * @return An {@link AnalysisData} object, or null if no data in DB
+ */
+public static AnalysisData create(Context context) {
+	synchronized (createLock) {
+		String[] rank = context.getResources().getStringArray(R.array.rank_array);
+		AnalysisData data = new AnalysisData();
+		int X = 0, A = 0, B = 0, Y = 0, C = 0, D = 0, T = 0, L1 = 0, L2 = 0;
+		ArrayList<BattleRecord> records = BattleRecord.getAll(context);
+		if (records.isEmpty()) {
+			return null;
+		}
+		for (int i = 0; i < records.size(); i++) {
+			boolean win = records.get(i).isWin();
+			Snake.MoveResult cause = records.get(i).getCause();
+			int duration = records.get(i).getDuration();
+			int myLength = records.get(i).getMyLength();
+			int enemyLength = records.get(i).getEnemyLength();
+			if (win) {
+				X++;
+				if (cause.equals(Snake.MoveResult.HIT_ENEMY))
+					A++;
+				else if (cause.equals(Snake.MoveResult.OUT)
+						|| cause.equals(Snake.MoveResult.SUICIDE))
+					B++;
+			} else {
+				Y++;
+				if (cause.equals(Snake.MoveResult.HIT_ENEMY))
+					C++;
+				else if (cause.equals(Snake.MoveResult.OUT)
+						|| cause.equals(Snake.MoveResult.SUICIDE))
+					D++;
+			}
+			T += duration;
+			L1 += myLength;
+			L2 += enemyLength;
+		}
+		data.N = records.size();
+		data.X = X;
+		data.A = A;
+		data.B = B;
+		data.Y = Y;
+		data.C = C;
+		data.D = D;
+		data.T = T / data.N;
+		data.L1 = L1 / data.N;
+		data.L2 = L2 / data.N;
+		data.W = (int)Math.round((100/data.N)
+				* ((7 * data.A + 5 * data.B)
+				* (18 - (Math.log(data.T + 1) / Math.log(2)))
+				+ (data.C + 3 * data.D) * (Math.log(data.T + 2) / Math.log(2))));
+		if (data.W >= 8500)
+			data.P = rank[0];
+		else if (data.W >= 6100)
+			data.P = rank[1];
+		else if (data.W >= 3800)
+			data.P = rank[2];
+		else if (data.W >= 1500)
+			data.P = rank[3];
+		else
+			data.P = rank[4];
+		return data;
+	}
+}
+```
+
 
 <a name="服务端数据"></a>
 ### 服务端数据
@@ -1054,6 +1290,64 @@ if (W > avg) {
 使用[UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)上传数据。
 
 // TODO 关键源码分析
+上传数据的服务继承IntentService类来完成，定时重新启动IntentService，以便服务器能够及时将最新数据上传
+```java
+/**
+ * Set the service alarm to start the service repeatedly.
+ *
+ * @param context The context
+ * @param on True to start the alarm, false to stop it.
+ */
+public static void setAlarm(Context context, boolean on) {
+	Intent i = new Intent(context, UploadService.class);
+	PendingIntent pi = PendingIntent.getService(context, 0, i, 0);
+	AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+	if (on) {
+		am.setRepeating(AlarmManager.RTC, System.currentTimeMillis(), Config.FREQUENCY_UPLOAD, pi);
+	} else {
+		am.cancel(pi);
+		pi.cancel();
+	}
+}
+
+/**
+ * Return true if the service alarm is on.
+ */
+public static boolean isAlarmOn(Context context) {
+	Intent i = new Intent(context, UploadService.class);
+	PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_NO_CREATE);
+	return pi != null;
+}
+```
+
+定时把最新的游戏数据上传到服务器上，以便进行所有玩家的综合数据分析
+```java
+@Override
+protected void onHandleIntent(Intent intent) {
+	Log.d(TAG, "onHandleIntent() called");
+	if (!NetworkUtil.isNetworkAvailable(this)) {
+		Log.d(TAG, "Network unavailable");
+	} else {
+		Log.d(TAG, "Network available");
+		AnalysisData data = AnalysisData.create(this);
+		if (data == null || data.N < Config.UPLOAD_THRESHOLD) {
+			return;
+		}
+		Log.d(TAG, "Insert W: " + data.W);
+		NetworkUtil.getInstance(this).insertW(data.W, new NetworkUtil.ResultListener<String>() {
+			@Override
+			public void onGotResult(String result) {
+				Log.d(TAG, "Response: " + result);
+			}
+
+			@Override
+			public void onError(VolleyError err) {
+				Log.e(TAG, err.toString());
+			}
+		});
+	}
+}
+```
 
 <a name="服务器"></a>
 ## 服务器
