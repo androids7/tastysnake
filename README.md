@@ -26,6 +26,9 @@
 * [TastySnake_1.0.1.161222.apk](./apk/TastySnake_1.0.1.161222.apk)
     * 修复蓝牙连接时的bug
     * 修复魅族系列提示框bug
+* [TastySnake_1.0.2.161230.apk](./apk/TastySnake_1.0.2.161230.apk)
+    * 修复Home键bug
+    * 优化返回键功能
 
 ## License
 

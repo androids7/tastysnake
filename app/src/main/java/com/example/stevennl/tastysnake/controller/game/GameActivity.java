@@ -5,13 +5,13 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.KeyEvent;
 
-import com.example.stevennl.tastysnake.base.SingleFragmentActivity;
+import com.example.stevennl.tastysnake.base.GameBaseActivity;
 import com.example.stevennl.tastysnake.util.network.UploadService;
 
 /**
  * Activity controlling the game.
  */
-public class GameActivity extends SingleFragmentActivity {
+public class GameActivity extends GameBaseActivity {
     private static final String TAG = "GameActivity";
 
     @Override

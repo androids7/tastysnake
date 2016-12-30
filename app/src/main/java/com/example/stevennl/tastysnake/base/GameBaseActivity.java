@@ -12,7 +12,7 @@ import com.example.stevennl.tastysnake.R;
 /**
  * Activity having only one fragment.
  */
-public abstract class SingleFragmentActivity extends BaseActivity {
+public abstract class GameBaseActivity extends BaseActivity {
 
     /**
      * Return the fragment in the activity.
