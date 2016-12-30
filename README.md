@@ -22,15 +22,11 @@
 ## 发布
 
 * [TastySnake_1.0.0.161220.apk](./apk/TastySnake_1.0.0.161220.apk)
-
     * 首次发布
-
 * [TastySnake_1.0.1.161222.apk](./apk/TastySnake_1.0.1.161222.apk)
-
     * 修复蓝牙连接时的bug
-
     * 修复魅族系列提示框bug
 
-## 开源许可证
+## License
 
-请参考[LICENSE](./LICENSE)。
+See the [LICENSE](./LICENSE) file for license rights and limitations.

@@ -969,13 +969,8 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 <a name="数据库操作"></a>
 ### 数据库操作
 
-对本地数据库的操作封装在[DBHelper.java](../app/src/main/java/com/example/stevennl/tastysnake/util/DBHelper.java)中。
+首先将battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/example/stevennl/tastysnake/model/BattleRecord.java)中:
 
-battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/example/stevennl/tastysnake/model/BattleRecord.java)中。
-
-// TODO 关键源码分析
-
-数据库中存储的数据每个项目作为私有成员封装在BattleRecord中
 ```java
 /**
  * Record of one battle.
@@ -988,28 +983,29 @@ public class BattleRecord {
     private int myLength;
     private int enemyLength;
 
-public BattleRecord() {
-}
+    public BattleRecord() {
+    }
 
-public BattleRecord(boolean win, Snake.MoveResult cause,
-					int duration, int myLength, int enemyLength) {
-	timestamp = new Date(System.currentTimeMillis());
-	this.win = win;
-	this.cause = cause;
-	this.duration = duration;
-	this.myLength = myLength;
-	this.enemyLength = enemyLength;
-}
+    public BattleRecord(boolean win, Snake.MoveResult cause,
+    					int duration, int myLength, int enemyLength) {
+    	timestamp = new Date(System.currentTimeMillis());
+    	this.win = win;
+    	this.cause = cause;
+    	this.duration = duration;
+    	this.myLength = myLength;
+    	this.enemyLength = enemyLength;
+    }
 
-@Override
-public String toString() {
-	return CommonUtil.formatDate(timestamp) + " " + win + " " + cause.name()
-			+ " " + duration + " " + myLength + " " + enemyLength;
+    @Override
+    public String toString() {
+    	return CommonUtil.formatDate(timestamp) + " " + win + " " + cause.name()
+    			+ " " + duration + " " + myLength + " " + enemyLength;
+    }
 }
 ```
 
+这个类处于Model层，除上述方法外还提供与数据库交互的方法：
 
-为了尽可能减少Controller的工作量，由Battlerecord进行对数据库的访问。访问操作包括“将当前数据存入数据库”、“得到数据库中所有数据”、“清空数据库“。
 ```java
 /**
  * Insert this record to database.
@@ -1039,46 +1035,8 @@ public static void removeAll(Context context) {
 }
 ```
 
-数据库的实现继承SQLiteOpenHelper类，对数据库进行简单的读写操作。
-用单例模式实现：
-```java
-/**
- * Return the only instance.
- */
-public static DBHelper getInstance(Context context) {
-	if (instance == null) {
-		instance = new DBHelper(context);
-	}
-	return instance;
-}
+我们使用[DBHelper.java](../app/src/main/java/com/example/stevennl/tastysnake/util/DBHelper.java)类与数据库进行交互，该类提供了以下几个与数据库交互的方法：
 
-/**
- * Initialize.
- */
-private DBHelper(Context context) {
-	super(context, DB_NAME, null, DB_VERSION);
-}
-
-@Override
-public void onCreate(SQLiteDatabase db) {
-	String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_BATTLE_RECORD
-			+ " (" + TABLE_COL[0] + " TEXT, "
-			+ TABLE_COL[1] + " INTEGER, "
-			+ TABLE_COL[2] + " INTEGER, "
-			+ TABLE_COL[3] + " INTEGER, "
-			+ TABLE_COL[4] + " INTEGER, "
-			+ TABLE_COL[5] + " INTEGER)";
-	db.execSQL(CREATE_TABLE);
-}
-
-@Override
-public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-	// Do nothing
-}
-```
-
-具体操作包括：
-插入当前数据项：
 ```java
 /**
  * Insert a battle record to database.
@@ -1101,10 +1059,7 @@ public void insert(BattleRecord record) {
 	db.insert(TABLE_BATTLE_RECORD, null, cv);
 	db.close();
 }
-```
-	
-读取所有数据项：
-```java
+
 /**
  * Return all battle records in database.
  */
@@ -1126,10 +1081,7 @@ public ArrayList<BattleRecord> getAllRecords() {
 	db.close();
 	return db_records;
 }
-```
 
-清空所有数据项：
-```java
 /**
  * Remove all battle records.
  */
@@ -1183,12 +1135,8 @@ public void removeAllRecords() {
 <a name="封装"></a>
 #### 封装
 
-我们将本地数据分析的API与计算结果封装在[AnalysisData.java](../app/src/main/java/com/example/stevennl/tastysnake/model/AnalysisData.java)中。
+我们将本地数据分析的API与计算结果封装在[AnalysisData.java](../app/src/main/java/com/example/stevennl/tastysnake/model/AnalysisData.java)中，该类的`create()`方法计算上述每一项指标，并将结果储存在该类的私有成员中：
 
-// TODO 关键源码分析
-
-目的是为了根据本地数据库计算出玩家目前为止所有游戏的综合情况，作为一个AnalysisData类型的数据返回：
-将每一项需要计算的指标当成私有成员放在AnalysisData类中，在对每一项指标进行计算处理：
 ```java
 /**
  * Create data to analyze.
@@ -1197,7 +1145,7 @@ public void removeAllRecords() {
  * @return An {@link AnalysisData} object, or null if no data in DB
  */
 public static AnalysisData create(Context context) {
-	synchronized (createLock) {
+	synchronized (createLock) {  // 加上互斥锁保证计算时的线程安全
 		String[] rank = context.getResources().getStringArray(R.array.rank_array);
 		AnalysisData data = new AnalysisData();
 		int X = 0, A = 0, B = 0, Y = 0, C = 0, D = 0, T = 0, L1 = 0, L2 = 0;
@@ -1259,7 +1207,6 @@ public static AnalysisData create(Context context) {
 }
 ```
 
-
 <a name="服务端数据"></a>
 ### 服务端数据
 
@@ -1289,11 +1236,38 @@ if (W > avg) {
 <a name="上传数据"></a>
 ### 上传数据
 
-使用[UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)上传数据。
+使用[UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)类上传数据。该类是`IntentService`的子类，在`onHandleIntent(Intent intent)`方法中我们实时计算出分析数据并上传给服务器：
 
-// TODO 关键源码分析
+```java
+@Override
+protected void onHandleIntent(Intent intent) {
+    Log.d(TAG, "onHandleIntent() called");
+    if (!NetworkUtil.isNetworkAvailable(this)) {
+        Log.d(TAG, "Network unavailable");
+    } else {
+        Log.d(TAG, "Network available");
+        AnalysisData data = AnalysisData.create(this);
+        if (data == null || data.N < Config.UPLOAD_THRESHOLD) {
+            return;
+        }
+        Log.d(TAG, "Insert W: " + data.W);
+        NetworkUtil.getInstance(this).insertW(data.W, new NetworkUtil.ResultListener<String>() {
+            @Override
+            public void onGotResult(String result) {
+                Log.d(TAG, "Response: " + result);
+            }
 
-上传数据的服务继承IntentService类来完成，定时重新启动IntentService，以便服务器能够及时将最新数据上传
+            @Override
+            public void onError(VolleyError err) {
+                Log.e(TAG, err.toString());
+            }
+        });
+    }
+}
+```
+
+由于`IntentService`在队列中没有`Intent`时会自动销毁，所以我们使用一个定时器每隔一段时间重新启动该服务。对定时器控制交给如下两个方法完成：
+
 ```java
 /**
  * Set the service alarm to start the service repeatedly.
@@ -1320,35 +1294,6 @@ public static boolean isAlarmOn(Context context) {
 	Intent i = new Intent(context, UploadService.class);
 	PendingIntent pi = PendingIntent.getService(context, 0, i, PendingIntent.FLAG_NO_CREATE);
 	return pi != null;
-}
-```
-
-定时把最新的游戏数据上传到服务器上，以便进行所有玩家的综合数据分析
-```java
-@Override
-protected void onHandleIntent(Intent intent) {
-	Log.d(TAG, "onHandleIntent() called");
-	if (!NetworkUtil.isNetworkAvailable(this)) {
-		Log.d(TAG, "Network unavailable");
-	} else {
-		Log.d(TAG, "Network available");
-		AnalysisData data = AnalysisData.create(this);
-		if (data == null || data.N < Config.UPLOAD_THRESHOLD) {
-			return;
-		}
-		Log.d(TAG, "Insert W: " + data.W);
-		NetworkUtil.getInstance(this).insertW(data.W, new NetworkUtil.ResultListener<String>() {
-			@Override
-			public void onGotResult(String result) {
-				Log.d(TAG, "Response: " + result);
-			}
-
-			@Override
-			public void onError(VolleyError err) {
-				Log.e(TAG, err.toString());
-			}
-		});
-	}
 }
 ```
 
