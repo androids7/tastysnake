@@ -974,6 +974,7 @@ public void getAvgW(@Nullable final ResultListener<Integer> listener) {
 battle_record表的记录封装在[BattleRecord.java](../app/src/main/java/com/example/stevennl/tastysnake/model/BattleRecord.java)中。
 
 // TODO 关键源码分析
+
 数据库中存储的数据每个项目作为私有成员封装在BattleRecord中
 ```java
 /**
@@ -1185,6 +1186,7 @@ public void removeAllRecords() {
 我们将本地数据分析的API与计算结果封装在[AnalysisData.java](../app/src/main/java/com/example/stevennl/tastysnake/model/AnalysisData.java)中。
 
 // TODO 关键源码分析
+
 目的是为了根据本地数据库计算出玩家目前为止所有游戏的综合情况，作为一个AnalysisData类型的数据返回：
 将每一项需要计算的指标当成私有成员放在AnalysisData类中，在对每一项指标进行计算处理：
 ```java
@@ -1290,6 +1292,7 @@ if (W > avg) {
 使用[UploadService.java](../app/src/main/java/com/example/stevennl/tastysnake/util/network/UploadService.java)上传数据。
 
 // TODO 关键源码分析
+
 上传数据的服务继承IntentService类来完成，定时重新启动IntentService，以便服务器能够及时将最新数据上传
 ```java
 /**
