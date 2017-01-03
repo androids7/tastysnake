@@ -33,6 +33,9 @@ android {
     useLibrary 'org.apache.http.legacy'
     compileSdkVersion 25
     buildToolsVersion = '25.0.2'
+    lintOptions {
+        abortOnError false
+    }
 }
 
 apply from: 'rules.gradle'

@@ -1,5 +1,7 @@
 # TastySnake
 
+[![Build Status](https://travis-ci.org/stevennL/TastySnake.svg?branch=master)](https://travis-ci.org/stevennL/TastySnake)
+
 这是一个基于蓝牙的重力感应贪吃蛇对战游戏。
 
 [技术实现](./doc/implementation.md)
