@@ -17,6 +17,8 @@ import com.example.stevennl.tastysnake.controller.test.DrawableGridTestActivity;
 import com.example.stevennl.tastysnake.controller.test.PacketTestActivity;
 import com.example.stevennl.tastysnake.controller.test.NetworkTestActivity;
 import com.example.stevennl.tastysnake.controller.test.SensorTestActivity;
+import com.example.stevennl.tastysnake.util.CommonUtil;
+import com.example.stevennl.tastysnake.util.bluetooth.BluetoothManager;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
@@ -41,7 +43,11 @@ public class MainActivity extends BaseActivity {
         bluetoothBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, BluetoothTestActivity.class));
+                if (BluetoothManager.getInstance().isSupport()) {
+                    startActivity(new Intent(MainActivity.this, BluetoothTestActivity.class));
+                } else {
+                    CommonUtil.showToast(MainActivity.this, getString(R.string.bluetooth_not_support));
+                }
             }
         });
 
