@@ -1,5 +1,7 @@
 # TastySnake [![Build Status](https://travis-ci.org/chuyangliu/TastySnake.svg?branch=master)](https://travis-ci.org/chuyangliu/TastySnake)
 
+***This project has been rewritten to a [web application](https://github.com/chuyangliu/EatMe/) and is no longer maintained.***
+
 这是一个基于蓝牙的重力感应贪吃蛇对战游戏。
 
 [技术实现](./doc/implementation.md)
